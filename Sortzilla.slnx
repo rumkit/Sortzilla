@@ -1,3 +1,6 @@
 <Solution>
+  <Project Path="Sortzilla.Benchmarks/Sortzilla.Benchmarks.csproj" />
   <Project Path="Sortzilla.CLI/Sortzilla.CLI.csproj" />
+  <Project Path="Sortzilla.Core/Sortzilla.Core.csproj" />
+  <Project Path="Sortzilla.Tests/Sortzilla.Tests.csproj" />
 </Solution>

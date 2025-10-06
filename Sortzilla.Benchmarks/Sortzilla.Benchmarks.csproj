@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Spectre.Console.Cli" Version="0.51.1" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.15.4" />
   </ItemGroup>
 
 </Project>
