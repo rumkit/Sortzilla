@@ -1,0 +1,11 @@
+﻿namespace Sortzilla.Core.Generator;
+
+public class RandomNumberSource : ISequenceSource<int>
+{
+    private Random _random = new Random();
+
+    public int Next()
+    {
+        return _random.Next(1, int.MaxValue);
+    }
+}
