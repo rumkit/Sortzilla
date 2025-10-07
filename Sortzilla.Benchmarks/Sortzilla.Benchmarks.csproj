@@ -15,4 +15,10 @@
     <ProjectReference Include="..\Sortzilla.Core\Sortzilla.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="english-10k-sorted.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

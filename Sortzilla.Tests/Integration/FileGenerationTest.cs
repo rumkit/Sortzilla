@@ -11,11 +11,10 @@ internal class FileGenerationTest : IDisposable
         new RandomNumberSource(),
         new RandomStringSource()
     );
-    private static readonly SpanWriter _spanWriter = new();
 
     public void Dispose()
     {
-        //File.Delete(TestFilePath);
+        File.Delete(TestFilePath);
     }
 
     [Test]
@@ -32,18 +31,6 @@ internal class FileGenerationTest : IDisposable
 
             await writer.FlushAsync();
         }
-
-        var fileSize = new FileInfo(TestFilePath).Length;
-
-        await Assert.That(fileSize).IsGreaterThanOrEqualTo(targetSize);
-    }
-
-    [Test]
-    public async Task GenerateFileOfSufficientSize2()
-    {
-        const long targetSize = 10_000_000_000; // ~1 GB
-        _spanWriter.Write(TestFilePath, targetSize);
-
 
         var fileSize = new FileInfo(TestFilePath).Length;
 

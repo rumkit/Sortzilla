@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-
-namespace Sortzilla.Core.Generator;
+﻿namespace Sortzilla.Core.Generator;
 
 public class SimpleLinesGenerator(ISequenceSource<int> digitsSource, ISequenceSource<string> wordsSource)
 {
