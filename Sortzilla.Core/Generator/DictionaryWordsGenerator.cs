@@ -27,6 +27,8 @@ public class DictionaryWordsGenerator : IWordsGenerator
         _isDictionarySeeded = true;
     }
 
+
+    // todo: can be replaced with ISequenceSource<string> for both cases
     private char GetNextChar() => Chars[_random.Next(Chars.Length)];
     private string GetNextWord() => _dictionary[_random.Next(_dictionary.Count)];
 

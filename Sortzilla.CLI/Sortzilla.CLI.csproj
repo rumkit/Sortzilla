@@ -11,4 +11,8 @@
     <PackageReference Include="Spectre.Console.Cli" Version="0.51.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Sortzilla.Core\Sortzilla.Core.csproj" />
+  </ItemGroup>
+
 </Project>

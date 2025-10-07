@@ -1,8 +1,9 @@
 ﻿using Sortzilla.Core.Generator;
+using Sortzilla.Tests.TestUtils;
 
 namespace Sortzilla.Tests;
 
-internal class LinesGeneratorTests
+internal class SimpleLinesGeneratorTests
 {
     private static readonly TestSequenceSource<int> _digitsSource = new([1, 2, 3]);
     private static readonly TestSequenceSource<string> _wordsSource = new(["one", "two", "three"]);
@@ -30,17 +31,6 @@ internal class LinesGeneratorTests
         };
 
         await Assert.That(lines).IsEquivalentTo(expectedLines);
-    }
-}
-
-internal class TestSequenceSource<T>(T[] elements) : ISequenceSource<T>
-{
-    int currentIndex = -1;
-    public T Next()
-    {
-        currentIndex++;
-        currentIndex %= elements.Length;
-        return elements[currentIndex];        
     }
 }
 

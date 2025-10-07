@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Sortzilla.CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "generate output.txt -s 100M -d .\\english-10k-sorted.txt"
+    }
+  }
+}

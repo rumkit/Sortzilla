@@ -18,9 +18,12 @@ public class OptimizedLinesGenerator(ISequenceSource<int> numbersSource, IWordsG
         while (currentLength < requiredTotalLength)
         {
             var nextNumber = numbersSource.Next();
-            if (!nextNumber.TryFormat(lineBuffer, out int charsWritten))            
+            if (!nextNumber.TryFormat(lineBuffer, out int charsWritten, "#\\. "))            
                 throw new InvalidOperationException($"Can't properly format {nextNumber}");
-            
+
+            //lineBuffer[charsWritten++] = '.';
+            //lineBuffer[charsWritten++] = ' ';
+
             charsWritten += wordsGenerator.WriteWordsToBuffer(lineBuffer[charsWritten .. ^newlineSpan.Length]);
             newlineSpan.CopyTo(lineBuffer[charsWritten ..]);
             charsWritten += newlineSpan.Length;
