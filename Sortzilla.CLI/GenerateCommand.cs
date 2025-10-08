@@ -57,7 +57,7 @@ public class GenerateCommand : Command<GenerateCommand.Settings>
             var wordsGenerator = settings.DictionaryFileName == null
                 ? new DictionaryWordsGenerator()
                 : new DictionaryWordsGenerator(File.ReadAllLines(settings.DictionaryFileName).ToHashSet());
-            var generator = new OptimizedLinesGenerator(new RandomNumberSource(), wordsGenerator);
+            var generator = new OptimizedLinesGenerator(wordsGenerator);
 
             generator.GenerateLines(size, lineSpan =>
             {

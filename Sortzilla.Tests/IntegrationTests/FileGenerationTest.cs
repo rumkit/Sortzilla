@@ -14,9 +14,9 @@ internal class FileGenerationTest : IDisposable
         new RandomStringSource()
     );
     private static readonly OptimizedLinesGenerator _optimizedGenerator = new(
-        new RandomNumberSource(),
         new RandomWordsGenerator()
-    );
+,
+        new RandomNumberSource());
 
     public void Dispose()
     {
@@ -26,15 +26,13 @@ internal class FileGenerationTest : IDisposable
     [Test]
     public async Task Simple_GenerateFileOfSufficientSize()
     {
-        using var fStream = File.Create(TestFilePath);
-        using var writer = new StreamWriter(fStream, bufferSize: BufferSize);
+        using (var fStream = File.Create(TestFilePath))
+        using (var writer = new StreamWriter(fStream, bufferSize: BufferSize))
         {
             foreach (var line in _simpleGenerator.GenerateLines(SizeToGenerate))
             {
                 await writer.WriteAsync(line);
             }
-
-            await writer.FlushAsync();
         }
 
         var fileSize = new FileInfo(TestFilePath).Length;
@@ -44,15 +42,13 @@ internal class FileGenerationTest : IDisposable
     [Test]
     public async Task Optimized_GenerateFileOfSufficientSize()
     {
-        using var fStream = File.Create(TestFilePath);
-        using var writer = new StreamWriter(fStream, bufferSize: BufferSize);
-
-        _optimizedGenerator.GenerateLines(SizeToGenerate, writer.Write);
-
-        await writer.FlushAsync();
+        using (var fStream = File.Create(TestFilePath))
+        using (var writer = new StreamWriter(fStream, bufferSize: BufferSize))
+        {
+            _optimizedGenerator.GenerateLines(SizeToGenerate, writer.Write);
+        }
 
         var fileSize = new FileInfo(TestFilePath).Length;
         await Assert.That(fileSize).IsGreaterThanOrEqualTo(SizeToGenerate);
-
     }
 }

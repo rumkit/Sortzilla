@@ -28,7 +28,7 @@ public class DictionaryWordsGenerator : IWordsGenerator
     }
 
 
-    // todo: can be replaced with ISequenceSource<string> for both cases
+    // todo: can be replaced with ISequenceSource<T> for both cases
     private char GetNextChar() => Chars[_random.Next(Chars.Length)];
     private string GetNextWord() => _dictionary[_random.Next(_dictionary.Count)];
 
@@ -80,6 +80,10 @@ public class DictionaryWordsGenerator : IWordsGenerator
 
             index += nextWord.Length;
         }
+
+        // remove trailing space
+        if (buffer[index - 1] == ' ')
+            index--;
 
         return index;
     }

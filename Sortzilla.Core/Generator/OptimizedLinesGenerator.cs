@@ -1,8 +1,18 @@
 ﻿namespace Sortzilla.Core.Generator;
 
-public class OptimizedLinesGenerator(ISequenceSource<int> numbersSource, IWordsGenerator wordsGenerator)
+public class OptimizedLinesGenerator
 {
     private const int MaxLineLength = 100;
+    private readonly ISequenceSource<int> _numbersSource;
+    private readonly IWordsGenerator _wordsGenerator;
+    private readonly ISequenceSource<bool> _entropySource;
+
+    public OptimizedLinesGenerator(IWordsGenerator wordsGenerator, ISequenceSource<int>? numbersSource = null, ISequenceSource<bool>? entropySource = null)
+    {
+        _wordsGenerator = wordsGenerator;
+        _numbersSource = numbersSource ?? new RandomNumberSource();        
+        _entropySource = entropySource ?? new EntropySource();
+    }
 
     public void GenerateLines(long requiredTotalLength, LinesGeneratorHandler lineHandler)
     {
@@ -13,23 +23,39 @@ public class OptimizedLinesGenerator(ISequenceSource<int> numbersSource, IWordsG
 
         ReadOnlySpan<char> newlineSpan = Environment.NewLine.AsSpan();
         Span<char> lineBuffer = stackalloc char[MaxLineLength];
-        
+
+        // used for duplicating lines
+        int previousStringPartStart = -1;
+        int previousLength = -1;
 
         while (currentLength < requiredTotalLength)
         {
-            var nextNumber = numbersSource.Next();
-            if (!nextNumber.TryFormat(lineBuffer, out int charsWritten, "#\\. "))            
+            var nextNumber = _numbersSource.Next();            
+
+            if (!nextNumber.TryFormat(lineBuffer, out int charsWritten, "#\\. "))
                 throw new InvalidOperationException($"Can't properly format {nextNumber}");
+            var stringPartStart = charsWritten;
 
-            //lineBuffer[charsWritten++] = '.';
-            //lineBuffer[charsWritten++] = ' ';
-
-            charsWritten += wordsGenerator.WriteWordsToBuffer(lineBuffer[charsWritten .. ^newlineSpan.Length]);
-            newlineSpan.CopyTo(lineBuffer[charsWritten ..]);
-            charsWritten += newlineSpan.Length;
+            // occasionally if possible the previous line part will be duplicated
+            if ((stringPartStart <= previousStringPartStart) && _entropySource.Next())
+            {
+                lineBuffer[previousStringPartStart..previousLength].CopyTo(lineBuffer[stringPartStart..]);
+                charsWritten += previousLength - previousStringPartStart;
+            }
+            else
+            {   
+                // provide a new string part
+                charsWritten += _wordsGenerator.WriteWordsToBuffer(lineBuffer[charsWritten..^newlineSpan.Length]);
+                newlineSpan.CopyTo(lineBuffer[charsWritten..]);
+                charsWritten += newlineSpan.Length;
+            }
 
             lineHandler(lineBuffer[..charsWritten]);
+            
             currentLength += charsWritten;
+
+            previousLength = charsWritten;
+            previousStringPartStart = stringPartStart;
         }
     }
 }

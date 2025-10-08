@@ -8,8 +8,8 @@ internal class OptimizedLinesGeneratorTests
     private static readonly TestSequenceSource<int> _digitsSource = new([1, 2, 3]);
     private static readonly TestSequenceSource<string> _wordsSource = new(["one", "two", "three"]);
     private static readonly OptimizedLinesGenerator _generator = new(
-        _digitsSource,
-        new TestWordsGenerator(_wordsSource));
+        new TestWordsGenerator(_wordsSource),
+        _digitsSource);
 
     [Test]
     [Arguments(-1)]

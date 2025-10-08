@@ -21,20 +21,20 @@ public class GeneratorToMemoryBenchmarks
     public void GlobalSetup()
     {
         _linesGeneratorWithRandomWords = new OptimizedLinesGenerator(
-            new RandomNumberSource(),
             new RandomWordsGenerator()
-        );
+,
+            new RandomNumberSource());
 
         _linesGeneratorWithCachedRandomWords = new OptimizedLinesGenerator(
-            new RandomNumberSource(),
             new DictionaryWordsGenerator()
-        );
+,
+            new RandomNumberSource());
 
         var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToHashSet();
         _linesGeneratorWithDictionary = new OptimizedLinesGenerator(
-            new RandomNumberSource(),
             new DictionaryWordsGenerator(dictionary)
-        );
+,
+            new RandomNumberSource());
     }
 
 
@@ -70,9 +70,9 @@ public class GeneratorToMemoryBenchmarks
     public int LinesGeneratorCachedWithInit()
     {
         var generator = new OptimizedLinesGenerator(
-            new RandomNumberSource(),
             new DictionaryWordsGenerator()
-        );
+,
+            new RandomNumberSource());
         int count = 0;
         generator.GenerateLines(TargetSize, _ => count++);
         return count;
@@ -91,9 +91,9 @@ public class GeneratorToMemoryBenchmarks
     {
         var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToHashSet();
         var generator = new OptimizedLinesGenerator(
-            new RandomNumberSource(),
             new DictionaryWordsGenerator(dictionary)
-        );
+,
+            new RandomNumberSource());
         int count = 0;
         generator.GenerateLines(TargetSize, _ => count++);
         return count;
