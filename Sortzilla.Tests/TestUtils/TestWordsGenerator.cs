@@ -2,9 +2,9 @@
 
 namespace Sortzilla.Tests.TestUtils;
 
-internal class TestWordsGenerator(ISequenceSource<string> source) : IWordsGenerator
+internal class TestWordsGenerator(ISequenceSource<string> source) : IStringPartWriter
 {
-    public int WriteWordsToBuffer(Span<char> buffer)
+    public int WriteStringPart(Span<char> buffer)
     {
         var word = source.Next();
         word.CopyTo(buffer);

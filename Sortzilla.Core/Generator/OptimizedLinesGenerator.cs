@@ -4,15 +4,17 @@ public class OptimizedLinesGenerator
 {
     private const int MaxLineLength = 100;
     private readonly ISequenceSource<int> _numbersSource;
-    private readonly IWordsGenerator _wordsGenerator;
+    private readonly IStringPartWriter _stringPartWriter;
     private readonly ISequenceSource<bool> _entropySource;
 
-    public OptimizedLinesGenerator(IWordsGenerator wordsGenerator, ISequenceSource<int>? numbersSource = null, ISequenceSource<bool>? entropySource = null)
+    public OptimizedLinesGenerator(IStringPartWriter stringPartWriter, ISequenceSource<int>? numbersSource = null, ISequenceSource<bool>? entropySource = null)
     {
-        _wordsGenerator = wordsGenerator;
-        _numbersSource = numbersSource ?? new RandomNumberSource();        
+        _stringPartWriter = stringPartWriter;
+        _numbersSource = numbersSource ?? new RandomPositiveNumberSource();        
         _entropySource = entropySource ?? new EntropySource();
     }
+
+    public OptimizedLinesGenerator(ISequenceSource<string> dictionarySource) : this(new StringPartWriter(dictionarySource)) { }
 
     public void GenerateLines(long requiredTotalLength, LinesGeneratorHandler lineHandler)
     {
@@ -45,7 +47,7 @@ public class OptimizedLinesGenerator
             else
             {   
                 // provide a new string part
-                charsWritten += _wordsGenerator.WriteWordsToBuffer(lineBuffer[charsWritten..^newlineSpan.Length]);
+                charsWritten += _stringPartWriter.WriteStringPart(lineBuffer[charsWritten..^newlineSpan.Length]);
                 newlineSpan.CopyTo(lineBuffer[charsWritten..]);
                 charsWritten += newlineSpan.Length;
             }

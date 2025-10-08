@@ -54,10 +54,10 @@ public class GenerateCommand : Command<GenerateCommand.Settings>
         {
             var fileTask = ctx.AddTask("Writing file", maxValue: size);
 
-            var wordsGenerator = settings.DictionaryFileName == null
-                ? new DictionaryWordsGenerator()
-                : new DictionaryWordsGenerator(File.ReadAllLines(settings.DictionaryFileName).ToHashSet());
-            var generator = new OptimizedLinesGenerator(wordsGenerator);
+            ISequenceSource<string> wordsSource = settings.DictionaryFileName == null
+                ? new RandomCachedDictionaryStringSource()
+                : new StaticDictionaryStringSource(File.ReadAllLines(settings.DictionaryFileName));
+            var generator = new OptimizedLinesGenerator(wordsSource);
 
             generator.GenerateLines(size, lineSpan =>
             {

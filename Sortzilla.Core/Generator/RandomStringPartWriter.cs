@@ -1,13 +1,13 @@
 ﻿namespace Sortzilla.Core.Generator;
 
-public class RandomWordsGenerator() : IWordsGenerator
+public class RandomStringPartWriter() : IStringPartWriter
 {
     private const string Chars = "abcdefghijklmnopqrstuvwxyz";
     private readonly Random _random = new Random();
     
     private char GetNextChar() => Chars[_random.Next(Chars.Length)];
 
-    public int WriteWordsToBuffer(Span<char> buffer)
+    public int WriteStringPart(Span<char> buffer)
     {
         int index = 0;
         // randomly select length between half and full buffer size

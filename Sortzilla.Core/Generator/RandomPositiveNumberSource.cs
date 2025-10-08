@@ -1,6 +1,6 @@
 ﻿namespace Sortzilla.Core.Generator;
 
-public class RandomNumberSource : ISequenceSource<int>
+public class RandomPositiveNumberSource : ISequenceSource<int>
 {
     private Random _random = new Random();
 

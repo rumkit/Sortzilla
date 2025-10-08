@@ -22,7 +22,7 @@ public class LinesComparer : IComparer<string>
 
         var stringComparisonResult = string.Compare(
             matchLeft.Groups["string"].Value,
-            matchRight.Groups["strign"].Value,
+            matchRight.Groups["string"].Value,
             StringComparison.OrdinalIgnoreCase);
 
         if(stringComparisonResult != 0)

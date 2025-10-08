@@ -6,15 +6,13 @@ public static class FormatValidator
 {
     private readonly static Regex LineRegex = LineTools.LineRegex();
 
-    public static (bool HasValidFormat, bool isSorted,bool HasRepetitions) ValidateLines(Stream stream)
+    public static (bool HasValidFormat, bool IsSorted, bool HasRepetitions) ValidateLines(Stream stream)
     {
         var isSorted = true;
         var hasRepetitions = false;
 
         var comparer = new LinesComparer();
         using var reader = new StreamReader(stream);
-
-        Dictionary<int, int> repetitions = new();
 
         if (!GetNextLine(reader, out string previousLine) || !LineRegex.IsMatch(previousLine))
             return (false, false, false);
@@ -23,7 +21,7 @@ public static class FormatValidator
         {
             var match = LineRegex.Match(currentLine);
             if(!match.Success || int.Parse(match.Groups["number"].Value) < 1)
-                return (HasValidFormat: false, isSorted, hasRepetitions);
+                return (HasValidFormat: false, false, hasRepetitions);
 
             if (isSorted && comparer.Compare(previousLine, currentLine) > 0)
                 isSorted = false;

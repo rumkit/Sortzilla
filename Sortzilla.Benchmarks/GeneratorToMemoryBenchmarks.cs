@@ -6,10 +6,10 @@ namespace Sortzilla.Benchmarks;
 [MemoryDiagnoser]
 public class GeneratorToMemoryBenchmarks
 {
-    private readonly SimpleLinesGenerator _simpleLinesGenerator = new SimpleLinesGenerator(new RandomNumberSource(), new RandomStringSource());
+    private readonly SimpleLinesGenerator _simpleLinesGenerator = new SimpleLinesGenerator(new RandomPositiveNumberSource(), new RandomStringSource());
     const long TargetSize = 100_000_000; // ~100 MB
     private static readonly SimpleLinesGenerator _generator = new(
-        new RandomNumberSource(),
+        new RandomPositiveNumberSource(),
         new RandomStringSource()
     );
     private OptimizedLinesGenerator _linesGeneratorWithRandomWords;
@@ -20,21 +20,12 @@ public class GeneratorToMemoryBenchmarks
     [GlobalSetup]
     public void GlobalSetup()
     {
-        _linesGeneratorWithRandomWords = new OptimizedLinesGenerator(
-            new RandomWordsGenerator()
-,
-            new RandomNumberSource());
+        _linesGeneratorWithRandomWords = new OptimizedLinesGenerator(new RandomStringPartWriter());
 
-        _linesGeneratorWithCachedRandomWords = new OptimizedLinesGenerator(
-            new DictionaryWordsGenerator()
-,
-            new RandomNumberSource());
+        _linesGeneratorWithCachedRandomWords = new OptimizedLinesGenerator(new RandomCachedDictionaryStringSource());
 
-        var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToHashSet();
-        _linesGeneratorWithDictionary = new OptimizedLinesGenerator(
-            new DictionaryWordsGenerator(dictionary)
-,
-            new RandomNumberSource());
+        var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToArray();
+        _linesGeneratorWithDictionary = new OptimizedLinesGenerator(new StaticDictionaryStringSource(dictionary));
     }
 
 
@@ -69,10 +60,7 @@ public class GeneratorToMemoryBenchmarks
     [Benchmark]
     public int LinesGeneratorCachedWithInit()
     {
-        var generator = new OptimizedLinesGenerator(
-            new DictionaryWordsGenerator()
-,
-            new RandomNumberSource());
+        var generator = new OptimizedLinesGenerator(new RandomCachedDictionaryStringSource());
         int count = 0;
         generator.GenerateLines(TargetSize, _ => count++);
         return count;
@@ -89,11 +77,8 @@ public class GeneratorToMemoryBenchmarks
     [Benchmark]
     public int LinesGeneratorDictionaryWithInit()
     {
-        var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToHashSet();
-        var generator = new OptimizedLinesGenerator(
-            new DictionaryWordsGenerator(dictionary)
-,
-            new RandomNumberSource());
+        var dictionary = File.ReadAllLines("english-10k-sorted.txt");
+        var generator = new OptimizedLinesGenerator(new StaticDictionaryStringSource(dictionary));
         int count = 0;
         generator.GenerateLines(TargetSize, _ => count++);
         return count;

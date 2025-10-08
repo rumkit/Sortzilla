@@ -8,15 +8,12 @@ namespace Sortzilla.Tests;
 
 public class GlobalHooks
 {
-    [Before(TestSession)]
-    public static void SetUp()
-    {
-        Console.WriteLine(@"Or you can define methods that do stuff before...");
-    }
+    public const string TestFileName = "testfile.txt";
 
     [After(TestSession)]
     public static void CleanUp()
     {
-        Console.WriteLine(@"...and after!");
+        if(File.Exists(TestFileName))
+            File.Delete(TestFileName);
     }
 }
