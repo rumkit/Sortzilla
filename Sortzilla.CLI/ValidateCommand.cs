@@ -33,7 +33,7 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
         {
             var validateTask = ctx.AddTask("Checking file", maxValue: 1);            
             validateTask.IsIndeterminate = true;
-            (hasValidFormat, isSorted, hasRepetitions) = FormatValidator.ValidateLines(fileStream);
+            (hasValidFormat, isSorted, hasRepetitions) = FormatSpanValidator.ValidateLines(fileStream);
             validateTask.Increment(1);
         });
 
