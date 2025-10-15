@@ -34,32 +34,37 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
 
     internal async Task<(string, long)> MergeFiles(string file1, string file2)
     {
-        var outputFileName = Path.Combine(WorkingDir, Guid.NewGuid().ToString());
+        var outputFileName = Path.Combine(WorkingDir, $"{Guid.NewGuid():N}.part");
         using var outputWriter = File.CreateText(outputFileName);
 
         using (var inputReader1 = File.OpenText(file1))
         using (var inputReader2 = File.OpenText(file2))
         {
-            while (!inputReader1.EndOfStream && !inputReader2.EndOfStream)
-            {
-                var line1 = await inputReader1.ReadLineAsync();
-                var line2 = await inputReader2.ReadLineAsync();
+            string? line1 = await inputReader1.ReadLineAsync();
+            string? line2 = await inputReader2.ReadLineAsync();
 
+            while (line1 != null && line2 != null)
+            {
                 var result = _comparer.Compare(line1, line2);
                 if (result < 0)
                 {
                     await outputWriter.WriteLineAsync(line1);
-                    await outputWriter.WriteLineAsync(line2);
+                    line1 = await inputReader1.ReadLineAsync();
                 }
                 else
                 {
                     await outputWriter.WriteLineAsync(line2);
-                    await outputWriter.WriteLineAsync(line1);
+                    line2 = await inputReader2.ReadLineAsync();
                 }
             }
 
+            if (line1 != null)
+                await outputWriter.WriteLineAsync(line1);
+            if (line2 != null)
+                await outputWriter.WriteLineAsync(line2);
+
             while (!inputReader1.EndOfStream)
-            {
+            {            
                 await outputWriter.WriteLineAsync(await inputReader1.ReadLineAsync());
             }
 

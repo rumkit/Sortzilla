@@ -23,7 +23,7 @@ internal class FileSplitConsumer(ChannelReader<FileSplitDto> channelReader, Sort
             if (channelReader.TryRead(out var fileChunk))
             {
                 var sortedLines = fileChunk.Lines.OrderBy(x => x, new LinesComparer());
-                var partName = Guid.NewGuid().ToString("N") + ".part";
+                var partName = $"{Guid.NewGuid():N}.part";
                 await File.WriteAllLinesAsync(Path.Combine(WorkingDir, partName), sortedLines);
             }                    
         }

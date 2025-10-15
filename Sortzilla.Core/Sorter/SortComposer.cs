@@ -11,7 +11,7 @@ public static class SortComposer
         {
             //todo: replace with CLI parameters or computed optimal ones
             MaxWorkersCount = 8,
-            ChunkSizeBytes = 1024 * 1024 * 10
+            ChunkSizeBytes = 1024 * 1024 * 128
         };
         
         using var inputFileStream = File.OpenRead(fileName);
