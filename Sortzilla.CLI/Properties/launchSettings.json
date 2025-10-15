@@ -2,7 +2,7 @@
   "profiles": {
     "Sortzilla.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "valid output.txt"
+      "commandLineArgs": "sort output.txt"
     }
   }
 }

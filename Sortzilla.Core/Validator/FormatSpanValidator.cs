@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using Sortzilla.Core.Sorter;
+using System.Text.RegularExpressions;
 
 namespace Sortzilla.Core.Validator;
 
@@ -10,8 +11,8 @@ public static class FormatSpanValidator
     {
         var isSorted = true;
         var hasRepetitions = false;
-        Span<char> firstLine = stackalloc char[100];
-        Span<char> secondLine = stackalloc char[100];
+        Span<char> firstLine = stackalloc char[SortSettings.MaxLineLength];
+        Span<char> secondLine = stackalloc char[SortSettings.MaxLineLength];
 
         var comparer = new LinesComparer();
         using var reader = new StreamSpanReader(stream);

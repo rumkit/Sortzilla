@@ -37,15 +37,12 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
             validateTask.Increment(1);
         });
 
-        // Create a list of Items
         var rows = new List<Text>()
         {
             new Text($"Has valid format: {hasValidFormat}", GetStyle(hasValidFormat)),
             new Text($"Is sorted: {isSorted}", GetStyle(isSorted)),
             new Text($"Has repetitions: {hasRepetitions}", GetStyle(hasRepetitions))
-         };
-
-        // Render each item in list on separate line
+        };
         AnsiConsole.Write(new Rows(rows));
 
         return 0;
