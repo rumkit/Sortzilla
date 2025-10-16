@@ -3,15 +3,14 @@ using System.Threading.Channels;
 
 namespace Sortzilla.Core.Sorter;
 
-internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, SortSettings settings, string inputFileName, Func<string, long, Task> fileMergedCallback)
+internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, SortContext context, Func<string, long, Task> fileMergedCallback)
 {
     private readonly List<Task> _workerTasks = new();
-    private readonly string WorkingDir = Path.Combine(settings.TempPath, inputFileName);
     private readonly IComparer<string> _comparer = new OptimizedLinesComparer();
 
     public void Run()
     {
-        for (int i = 0; i < settings.MaxWorkersCount; i++)
+        for (int i = 0; i < context.Settings.MaxWorkersCount; i++)
         {
             _workerTasks.Add(Task.Run(WorkerPayload));
         }
@@ -34,7 +33,7 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
 
     internal async Task<(string, long)> MergeFiles(string file1, string file2)
     {
-        var outputFileName = Path.Combine(WorkingDir, $"{Guid.NewGuid():N}.part");
+        var outputFileName = Path.Combine(context.WorkingDirectory, $"{Guid.NewGuid():N}.part");
         using var outputWriter = File.CreateText(outputFileName);
 
         using (var inputReader1 = File.OpenText(file1))

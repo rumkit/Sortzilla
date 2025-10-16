@@ -2,7 +2,7 @@
 
 namespace Sortzilla.Core;
 
-public class LinesComparer : IComparer<string>
+internal class LinesComparer : IComparer<string>
 {
     public int Compare(string? left, string? right)
     {

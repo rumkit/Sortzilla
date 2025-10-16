@@ -1,8 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿namespace Sortzilla.Core;
 
-namespace Sortzilla.Core;
-
-public class OptimizedLinesComparer : IComparer<string>
+internal class OptimizedLinesComparer : IComparer<string>
 {
     public int Compare(string? left, string? right)
     {

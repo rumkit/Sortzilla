@@ -2,17 +2,17 @@
 
 namespace Sortzilla.Core.Sorter;
 
-internal class FileSplitProducer(ChannelWriter<FileSplitDto> channelWriter, SortSettings settings)
+internal class FileSplitProducer(ChannelWriter<FileSplitDto> channelWriter, SortContext context)
 {
     public async Task SplitAsync(Stream inputFile)
     {
         using var reader = new StreamReader(inputFile);
-        var chunkSizeTarget = settings.ChunkSizeBytes;
+        var chunkSizeTarget = context.Settings.ChunkSizeBytes;
 
         // Split file to chunks and send to consumers
         while (!reader.EndOfStream)
         {
-            var chunkLines = new List<string>(chunkSizeTarget / SortSettings.MaxLineLength);
+            var chunkLines = new List<string>(chunkSizeTarget / SortSettingsInternal.MaxLineLength);
             var currentChunkSize = 0;
             while (!reader.EndOfStream && currentChunkSize < chunkSizeTarget)
             {

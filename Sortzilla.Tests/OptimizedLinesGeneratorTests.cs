@@ -5,14 +5,16 @@ namespace Sortzilla.Tests;
 
 internal class OptimizedLinesGeneratorTests
 {
-    private static readonly TestSequenceSource<int> _digitsSource = new([1, 2, 3]);
-    private static readonly TestSequenceSource<bool> entropyFalseSource = new([false]);
-    private static readonly TestSequenceSource<bool> entropyTrueSource = new([true]);
-    private static readonly TestSequenceSource<string> _wordsSource = new(["one", "two", "three"]);
-    private static readonly OptimizedLinesGenerator _generator = new(
-        new TestWordsGenerator(_wordsSource),
-        _digitsSource,
-        entropyFalseSource);
+    private readonly TestSequenceSource<int> _digitsSource = new([1, 2, 3]);
+    private readonly TestSequenceSource<bool> entropyFalseSource = new([false]);
+    private readonly TestSequenceSource<bool> entropyTrueSource = new([true]);
+    private readonly TestSequenceSource<string> _wordsSource = new(["one", "two", "three"]);
+    private readonly OptimizedLinesGenerator _generator; 
+
+    public OptimizedLinesGeneratorTests()
+    {
+        _generator = new(new TestWordsGenerator(_wordsSource), _digitsSource, entropyFalseSource);
+    }
 
     [Test]
     [Arguments(-1)]

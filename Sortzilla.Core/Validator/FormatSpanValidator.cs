@@ -12,8 +12,8 @@ public static class FormatSpanValidator
         long bytesProcessed = 0;
         var isSorted = true;
         var hasRepetitions = false;
-        Span<char> firstLine = stackalloc char[SortSettings.MaxLineLength];
-        Span<char> secondLine = stackalloc char[SortSettings.MaxLineLength];
+        Span<char> firstLine = stackalloc char[SortSettingsInternal.MaxLineLength];
+        Span<char> secondLine = stackalloc char[SortSettingsInternal.MaxLineLength];
 
         var comparer = new OptimizedLinesComparer();
         using var reader = new StreamSpanReader(stream);

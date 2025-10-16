@@ -1,9 +1,8 @@
 ﻿namespace Sortzilla.Core.Sorter;
 
-internal class SortSettings
+public class SortSettings
 {
-    internal const int MaxLineLength = 100;
-    public string TempPath { get; init; } = Path.Combine(Path.GetTempPath(), "Sortzilla");
-    public int ChunkSizeBytes { get; init; } = 256 * 1024 * 1024; // 256 MB
-    public int MaxWorkersCount { get; init; } = Environment.ProcessorCount;
+    public string? TempPath { get; init; } 
+    public int? ChunkSizeBytes { get; init; }
+    public int? MaxWorkersCount { get; init; }
 }

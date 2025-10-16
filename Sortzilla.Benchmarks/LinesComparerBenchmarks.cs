@@ -1,6 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Sortzilla.Core;
-using Sortzilla.Core.Validator;
 
 namespace Sortzilla.Benchmarks;
 

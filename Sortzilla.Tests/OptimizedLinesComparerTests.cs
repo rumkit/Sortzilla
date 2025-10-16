@@ -1,6 +1,4 @@
 ﻿using Sortzilla.Core;
-using Sortzilla.Core.Generator;
-using Sortzilla.Tests.TestUtils;
 
 namespace Sortzilla.Tests;
 

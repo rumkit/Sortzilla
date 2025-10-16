@@ -8,6 +8,18 @@ public class SortCommand : AsyncCommand<SortCommand.Settings>
     {
         [CommandArgument(0, "<FileName>")]
         public required string FileName { get; set; }
+
+        [CommandOption("-o|--output <OuputFileName>")]
+        public string? OutputFileName { get; set; }
+
+        [CommandOption("-w|--workers <WorkersCount>")]
+        public int? WorkersCount { get; set; }
+
+        [CommandOption("-m|--memoryLimit <MemoryLimitPerChunk>")]
+        public int? MemoryLimit { get; set; }
+
+        [CommandOption("-t|--tempPath <TemporaryFolderPath>")]
+        public string? TempDirectory { get; set; }
     }
 
     public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -26,7 +38,15 @@ public class SortCommand : AsyncCommand<SortCommand.Settings>
         {
             var validateTask = ctx.AddTask("Sorting file", maxValue: 1);
             validateTask.IsIndeterminate = true;
-            await SortComposer.SortFileAsync(settings.FileName);
+
+            var sortSettings = new SortSettings
+            {
+                MaxWorkersCount = settings.WorkersCount,
+                ChunkSizeBytes = settings.MemoryLimit,
+                TempPath = settings.TempDirectory
+            };
+            await SortComposer.SortFileAsync(settings.FileName, settings.OutputFileName, sortSettings);
+
             validateTask.Increment(1);
         });
 

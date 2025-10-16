@@ -1,28 +1,27 @@
-﻿using System.Dynamic;
-using System.Threading.Channels;
+﻿using System.Threading.Channels;
 
 namespace Sortzilla.Core.Sorter;
 
 public static class SortComposer
 {
-    public static async Task SortFileAsync(string fileName)
+    public static async Task SortFileAsync(string fileName, string? outputFileName, SortSettings? settings = null)
     {
-        var settings = new SortSettings()
-        {
-            //todo: replace with CLI parameters or computed optimal ones
-            MaxWorkersCount = 6,
-            ChunkSizeBytes = 1024 * 1024 * 128
-        };
+        var sortContext = SortContext.GetContext(fileName, outputFileName, settings);
         
         using var inputFileStream = File.OpenRead(fileName);
         var fileSize = inputFileStream.Length;
 
-        var tempFilesDirectory = Path.Combine(settings.TempPath, fileName);
-        if(!Directory.Exists(tempFilesDirectory))
-            Directory.CreateDirectory(tempFilesDirectory);
+        // Prepare working directory for temp files
+        if (Directory.Exists(sortContext.WorkingDirectory))
+            Directory.Delete(sortContext.WorkingDirectory, true);
+
+        Directory.CreateDirectory(sortContext.WorkingDirectory);
 
         // Prepare producer and consumers for splitting the input file in parts
-        var channelBound = settings.MaxWorkersCount > 3 ? settings.MaxWorkersCount / 2 : settings.MaxWorkersCount;
+        var channelBound = sortContext.Settings.MaxWorkersCount > 3 
+            ? sortContext.Settings.MaxWorkersCount / 2 
+            : sortContext.Settings.MaxWorkersCount;
+
         var splitChannel = Channel.CreateBounded<FileSplitDto>(new BoundedChannelOptions(channelBound)
         {
             SingleReader = false,
@@ -30,8 +29,8 @@ public static class SortComposer
             FullMode = BoundedChannelFullMode.Wait
         });
 
-        var splitProducer = new FileSplitProducer(splitChannel.Writer, settings);
-        var splitConsumer = new FileSplitConsumer(splitChannel.Reader, settings, fileName);
+        var splitProducer = new FileSplitProducer(splitChannel.Writer, sortContext);
+        var splitConsumer = new FileSplitConsumer(splitChannel.Reader, sortContext);
 
         splitConsumer.Run();
         await splitProducer.SplitAsync(inputFileStream);
@@ -41,14 +40,19 @@ public static class SortComposer
 
         // and start merging temp files
         var mergeChannel = Channel.CreateUnbounded<FileMergeDto>();
-        var mergeProducer = new FileMergeProducer(mergeChannel.Writer, settings, fileName, fileSize);
-        var mergeConsumer = new FileMergeConsumer(mergeChannel.Reader, settings, fileName, mergeProducer.OnNewFileReadyAsync);
+        var mergeProducer = new FileMergeProducer(mergeChannel.Writer, sortContext);
+        var mergeConsumer = new FileMergeConsumer(mergeChannel.Reader, sortContext, mergeProducer.OnNewFileReadyAsync);
 
-        mergeConsumer.Run();
         await mergeProducer.MergeAsync();
+        mergeConsumer.Run();
 
+        // Wait for all merge workers to complete
         await mergeConsumer;
 
-        File.Move(mergeProducer.ResultFileName, fileName + "-sorted");
+        if (string.IsNullOrEmpty(mergeProducer.ResultFileName))
+            throw new ApplicationException("Cannot locate result file");
+
+        // and move the resulting file to the output destination
+        File.Move(mergeProducer.ResultFileName, sortContext.OutputFileName);
     }
 }

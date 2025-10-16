@@ -2,7 +2,7 @@
 
 public class OptimizedLinesGenerator
 {
-    private const int MaxLineLength = Sorter.SortSettings.MaxLineLength;
+    private const int MaxLineLength = Sorter.SortSettingsInternal.MaxLineLength;
     private readonly ISequenceSource<int> _numbersSource;
     private readonly IStringPartWriter _stringPartWriter;
     private readonly ISequenceSource<bool> _entropySource;

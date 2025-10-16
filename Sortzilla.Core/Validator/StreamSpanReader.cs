@@ -2,7 +2,7 @@
 
 namespace Sortzilla.Core.Validator;
 
-public class StreamSpanReader : IDisposable
+internal class StreamSpanReader : IDisposable
 {
     private readonly bool _leaveOpen;
     private readonly Stream _stream;

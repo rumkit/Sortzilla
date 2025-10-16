@@ -2,7 +2,7 @@
 
 namespace Sortzilla.Core.Sorter;
 
-internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortSettings settings, string initialFileName, long initialFileSize)
+internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortContext context)
 {
     private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
     private string _file1 = string.Empty;
@@ -11,7 +11,7 @@ internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortSetting
 
     public async Task MergeAsync()
     {
-        foreach(var fileName in Directory.EnumerateFiles(Path.Combine(settings.TempPath, initialFileName)))
+        foreach(var fileName in Directory.EnumerateFiles(context.WorkingDirectory))
         {
             await OnNewFileReadyAsync(fileName, new FileInfo(fileName).Length);
         }
@@ -20,7 +20,7 @@ internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortSetting
     public async Task OnNewFileReadyAsync(string fileName, long fileSize)
     {
         // The file is the final merged file
-        if(fileSize >= initialFileSize)
+        if(fileSize >= context.FileSize)
         {
             writer.Complete();
             ResultFileName = fileName;
