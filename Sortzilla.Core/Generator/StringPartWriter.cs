@@ -1,6 +1,6 @@
 ﻿namespace Sortzilla.Core.Generator;
 
-public class StringPartWriter : IStringPartWriter
+internal class StringPartWriter : IStringPartWriter
 {
     private readonly ISequenceSource<string> _dictionarySource;
     private readonly Random _random = new Random();

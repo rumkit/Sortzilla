@@ -7,7 +7,7 @@ public class OptimizedLinesGenerator
     private readonly IStringPartWriter _stringPartWriter;
     private readonly ISequenceSource<bool> _entropySource;
 
-    public OptimizedLinesGenerator(IStringPartWriter stringPartWriter, ISequenceSource<int>? numbersSource = null, ISequenceSource<bool>? entropySource = null)
+    internal OptimizedLinesGenerator(IStringPartWriter stringPartWriter, ISequenceSource<int>? numbersSource = null, ISequenceSource<bool>? entropySource = null)
     {
         _stringPartWriter = stringPartWriter;
         _numbersSource = numbersSource ?? new RandomPositiveNumberSource();        

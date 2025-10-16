@@ -1,4 +1,5 @@
 ﻿using Sortzilla.Core.Sorter;
+using Sortzilla.Tests.TestUtils;
 using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Channels;
@@ -18,7 +19,7 @@ internal class FileSplitProducerTests
     public async Task SplitAsync_WhenCalled_ShouldSplitStreamIntoChunks()
     {
         var channel = Channel.CreateUnbounded<FileSplitDto>();
-        var producer = new FileSplitProducer(channel.Writer, GetSortContext(Input.Length, 16));
+        var producer = new FileSplitProducer(channel.Writer, SortContextFactory.GetContext(Input.Length, 16));
 
         using var inputStream = new MemoryStream(Encoding.ASCII.GetBytes(Input));
         await producer.SplitAsync(inputStream);
@@ -30,19 +31,5 @@ internal class FileSplitProducerTests
         await Assert.That(channel.Writer.TryComplete()).IsFalse();
         await Assert.That(messages).HasCount(2);
     }
-
-    public static SortContext GetSortContext(int fileSize, int chunkSize) => new()
-    {
-        FileSize = fileSize,
-        InputFileName = "input",
-        OutputFileName = "output",
-        WorkingDirectory = string.Empty,
-        Settings = new SortSettingsInternal
-        {
-            ChunkSizeBytes = chunkSize,
-            MaxWorkersCount =  1,
-            TempPath = string.Empty
-        }
-    };
 }
 
