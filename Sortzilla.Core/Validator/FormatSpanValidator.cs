@@ -9,7 +9,6 @@ public static class FormatSpanValidator
 
     public static (bool HasValidFormat, bool IsSorted, bool HasRepetitions) ValidateLines(Stream stream, Action<long>? progressCallback = null)
     {
-        long bytesProcessed = 0;
         var isSorted = true;
         var hasRepetitions = false;
         Span<char> firstLine = stackalloc char[SortSettingsInternal.MaxLineLength];
@@ -22,7 +21,6 @@ public static class FormatSpanValidator
             return (false, false, false);
         int firstDotIndex = firstLine[.. firstLineLength].IndexOf('.');
         int firstNumber = int.Parse(firstLine[..firstDotIndex]);
-        bytesProcessed += firstLineLength;
 
 
         while (ReadNextLine(reader, secondLine, out int secondLineLength))
@@ -54,8 +52,7 @@ public static class FormatSpanValidator
                 hasRepetitions = firstLine[firstDotIndex..firstLineLength].SequenceEqual(secondLine[secondDotIndex .. secondLineLength]);
             }
 
-            bytesProcessed += secondLineLength;
-            progressCallback?.Invoke(bytesProcessed);
+            progressCallback?.Invoke(stream.Position);
 
             secondLine[.. secondLineLength].CopyTo(firstLine);
             firstLineLength = secondLineLength;

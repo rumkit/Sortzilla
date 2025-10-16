@@ -34,8 +34,15 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
         .Start(ctx =>
         {
             var validateTask = ctx.AddTask("Checking file", maxValue: 100);
-            (hasValidFormat, isSorted, hasRepetitions) = FormatSpanValidator.ValidateLines(fileStream, (bytesProcessed) => validateTask.Value = bytesProcessed * 100 / fileLength);
-            validateTask.Value = 100;
+            long bytesProcessed = 0;
+
+            var workerTask = Task.Run(() =>
+                (hasValidFormat, isSorted, hasRepetitions) = FormatSpanValidator.ValidateLines(fileStream, (x) => bytesProcessed = x));            
+
+            while (!workerTask.IsCompleted)
+            {
+                validateTask.Value = bytesProcessed * 100 / fileLength;
+            }
         });
 
         var rows = new List<Text>()
@@ -49,5 +56,7 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
         return 0;
     }
 
-    private Style GetStyle(bool condition) => condition ? new Style(foreground: Color.Green) : new Style(foreground: Color.Red);
+    private Style GetStyle(bool condition) => condition 
+        ? new Style(foreground: Color.Green) 
+        : new Style(foreground: Color.Red);
 }

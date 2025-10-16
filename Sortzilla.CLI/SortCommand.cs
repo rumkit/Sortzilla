@@ -36,8 +36,8 @@ public class SortCommand : AsyncCommand<SortCommand.Settings>
         ])
         .StartAsync(async ctx =>
         {
-            var validateTask = ctx.AddTask("Sorting file", maxValue: 1);
-            validateTask.IsIndeterminate = true;
+            var sortTask = ctx.AddTask("Sorting file", maxValue: 1);
+            sortTask.IsIndeterminate = true;
 
             var sortSettings = new SortSettings
             {
@@ -47,8 +47,10 @@ public class SortCommand : AsyncCommand<SortCommand.Settings>
             };
             await SortComposer.SortFileAsync(settings.FileName, settings.OutputFileName, sortSettings);
 
-            validateTask.Increment(1);
+            sortTask.Increment(1);
         });
+
+        AnsiConsole.MarkupLine($"[green]Done![/]");
 
         return 0;
     }

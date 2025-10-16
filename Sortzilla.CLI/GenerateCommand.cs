@@ -1,9 +1,10 @@
 ﻿using Sortzilla.Core.Generator;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System;
 using System.Text.RegularExpressions;
 
-public class GenerateCommand : Command<GenerateCommand.Settings>
+public class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -18,7 +19,7 @@ public class GenerateCommand : Command<GenerateCommand.Settings>
     }
 
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         Regex sizeRegex = new(@"^(\d+)([KMG]?)$", RegexOptions.IgnoreCase);
         var match = sizeRegex.Match(settings.Size);
@@ -39,7 +40,7 @@ public class GenerateCommand : Command<GenerateCommand.Settings>
         using var streamWriter = new StreamWriter(fileStream, bufferSize: 10_000_000);
 
 
-        AnsiConsole.Progress()
+        await AnsiConsole.Progress()
         .AutoClear(false)   // Do not remove the task list when done
         .HideCompleted(false)   // Hide tasks as they are completed
         .Columns(
@@ -50,20 +51,26 @@ public class GenerateCommand : Command<GenerateCommand.Settings>
                 new ElapsedTimeColumn(),        // Elapsed time
                 new SpinnerColumn(),            // Spinner
         ])
-        .Start(ctx =>
+        .StartAsync(async ctx =>
         {
-            var fileTask = ctx.AddTask("Writing file", maxValue: size);
+            var fileTask = ctx.AddTask("Writing file");
 
             ISequenceSource<string> wordsSource = settings.DictionaryFileName == null
                 ? new RandomCachedDictionaryStringSource()
                 : new StaticDictionaryStringSource(File.ReadAllLines(settings.DictionaryFileName));
             var generator = new OptimizedLinesGenerator(wordsSource);
+            long bytesWrittern = 0;
 
-            generator.GenerateLines(size, lineSpan =>
+            var generatorTask = Task.Run(() => generator.GenerateLines(size, lineSpan =>
             {
                 streamWriter.Write(lineSpan);
-                fileTask.Increment(lineSpan.Length);
-            });
+                bytesWrittern += lineSpan.Length;
+            }));
+
+            while (!generatorTask.IsCompleted)
+            {
+                fileTask.Value = bytesWrittern * 100 / size;
+            }
         });
 
         AnsiConsole.MarkupLine($"[green]Done![/]");
