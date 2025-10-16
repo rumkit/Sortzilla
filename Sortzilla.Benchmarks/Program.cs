@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
 using Sortzilla.Benchmarks;
+using Sortzilla.Core;
 
-var summary = BenchmarkRunner.Run<ValidatorBenchmarks>();
+var summary = BenchmarkRunner.Run<LinesComparerBenchmarks>();

@@ -7,20 +7,22 @@ public static class FormatSpanValidator
 {
     private readonly static Regex LineRegex = LineTools.LineRegex();
 
-    public static (bool HasValidFormat, bool IsSorted, bool HasRepetitions) ValidateLines(Stream stream)
+    public static (bool HasValidFormat, bool IsSorted, bool HasRepetitions) ValidateLines(Stream stream, Action<long>? progressCallback = null)
     {
+        long bytesProcessed = 0;
         var isSorted = true;
         var hasRepetitions = false;
         Span<char> firstLine = stackalloc char[SortSettings.MaxLineLength];
         Span<char> secondLine = stackalloc char[SortSettings.MaxLineLength];
 
-        var comparer = new LinesComparer();
+        var comparer = new OptimizedLinesComparer();
         using var reader = new StreamSpanReader(stream);
 
         if (!ReadNextLine(reader, firstLine, out int firstLineLength) || !LineRegex.IsMatch(firstLine[..firstLineLength]))
             return (false, false, false);
         int firstDotIndex = firstLine[.. firstLineLength].IndexOf('.');
         int firstNumber = int.Parse(firstLine[..firstDotIndex]);
+        bytesProcessed += firstLineLength;
 
 
         while (ReadNextLine(reader, secondLine, out int secondLineLength))
@@ -48,9 +50,12 @@ public static class FormatSpanValidator
 
             if (!hasRepetitions)
             {
-                // works only if adjacent or already sorted
+                // works only if lines are adjacent or the file is already sorted
                 hasRepetitions = firstLine[firstDotIndex..firstLineLength].SequenceEqual(secondLine[secondDotIndex .. secondLineLength]);
             }
+
+            bytesProcessed += secondLineLength;
+            progressCallback?.Invoke(bytesProcessed);
 
             secondLine[.. secondLineLength].CopyTo(firstLine);
             firstLineLength = secondLineLength;

@@ -10,7 +10,7 @@ public static class SortComposer
         var settings = new SortSettings()
         {
             //todo: replace with CLI parameters or computed optimal ones
-            MaxWorkersCount = 8,
+            MaxWorkersCount = 6,
             ChunkSizeBytes = 1024 * 1024 * 128
         };
         

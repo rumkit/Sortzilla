@@ -7,6 +7,7 @@ internal class FileSplitConsumer(ChannelReader<FileSplitDto> channelReader, Sort
 {
     private readonly List<Task> _workerTasks = new();
     private readonly string WorkingDir = Path.Combine(settings.TempPath, inputFileName);
+    private static readonly IComparer<string> LinesComparer = new OptimizedLinesComparer();
 
     public void Run()
     {
@@ -22,7 +23,7 @@ internal class FileSplitConsumer(ChannelReader<FileSplitDto> channelReader, Sort
         {
             if (channelReader.TryRead(out var fileChunk))
             {
-                var sortedLines = fileChunk.Lines.OrderBy(x => x, new LinesComparer());
+                var sortedLines = fileChunk.Lines.OrderBy(x => x, LinesComparer);
                 var partName = $"{Guid.NewGuid():N}.part";
                 await File.WriteAllLinesAsync(Path.Combine(WorkingDir, partName), sortedLines);
             }                    

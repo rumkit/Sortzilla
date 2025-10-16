@@ -7,7 +7,7 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
 {
     private readonly List<Task> _workerTasks = new();
     private readonly string WorkingDir = Path.Combine(settings.TempPath, inputFileName);
-    private readonly IComparer<string> _comparer = new LinesComparer();
+    private readonly IComparer<string> _comparer = new OptimizedLinesComparer();
 
     public void Run()
     {

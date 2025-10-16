@@ -12,7 +12,8 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
 
 
     public override int Execute(CommandContext context, Settings settings)
-    {  
+    {
+        var fileLength = new FileInfo(settings.FileName).Length;
         using var fileStream = File.OpenRead(settings.FileName);
 
         bool hasValidFormat = false;
@@ -26,15 +27,15 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
         [
                 new TaskDescriptionColumn(),    // Task description
                 new ProgressBarColumn(),        // Progress bar
+                new PercentageColumn(),         // Percentage
                 new ElapsedTimeColumn(),        // Elapsed time
                 new SpinnerColumn(),            // Spinner
         ])
         .Start(ctx =>
         {
-            var validateTask = ctx.AddTask("Checking file", maxValue: 1);            
-            validateTask.IsIndeterminate = true;
-            (hasValidFormat, isSorted, hasRepetitions) = FormatSpanValidator.ValidateLines(fileStream);
-            validateTask.Increment(1);
+            var validateTask = ctx.AddTask("Checking file", maxValue: 100);
+            (hasValidFormat, isSorted, hasRepetitions) = FormatSpanValidator.ValidateLines(fileStream, (bytesProcessed) => validateTask.Value = bytesProcessed * 100 / fileLength);
+            validateTask.Value = 100;
         });
 
         var rows = new List<Text>()
