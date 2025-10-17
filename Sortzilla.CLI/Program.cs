@@ -1,4 +1,5 @@
 ﻿using Spectre.Console.Cli;
+using System.Globalization;
 
 var app = new CommandApp();
 app.Configure(config =>
@@ -16,7 +17,8 @@ app.Configure(config =>
 
     config.AddCommand<SortCommand>("sort")
         .WithDescription("Sorts the provided file")
-        .WithExample("sort", "file.txt");
+        .WithExample("sort", "file.txt")
+        .WithExample("sort", "input.txt", "-o", "input-sorted.txt", "-w", "16", "-t", ".\\TMP");
 
 });
 
