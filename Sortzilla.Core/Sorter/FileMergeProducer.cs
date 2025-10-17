@@ -11,43 +11,57 @@ internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortContext
 
     public async Task MergeAsync()
     {
-        foreach(var fileName in Directory.EnumerateFiles(context.WorkingDirectory))
+        // block adding new files until initial processing is over
+        await _semaphore.WaitAsync();
+        try
         {
-            await OnNewFileReadyAsync(fileName, new FileInfo(fileName).Length);
+            foreach (var fileName in Directory.EnumerateFiles(context.WorkingDirectory))
+            {
+                await OnNewFileReadyInternalAsync(fileName, new FileInfo(fileName).Length);
+            }
+        }
+        finally
+        {
+            _semaphore.Release();
         }
     }
 
     public async Task OnNewFileReadyAsync(string fileName, long fileSize)
     {
+        await _semaphore.WaitAsync();
+
+        try
+        {
+            await OnNewFileReadyInternalAsync(fileName, fileSize);
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    internal async Task OnNewFileReadyInternalAsync(string fileName, long fileSize)
+    {
         // The file is the final merged file
-        if(fileSize >= context.FileSize)
+        if (fileSize >= context.FileSize)
         {
             writer.Complete();
             ResultFileName = fileName;
             return;
         }
 
-        await _semaphore.WaitAsync();
-
-        try
+        if (string.IsNullOrEmpty(_file1))
         {
-            if (string.IsNullOrEmpty(_file1))
-            {
-                _file1 = fileName;
-                return;
-            }
-
-            await writer.WriteAsync(new FileMergeDto
-            {
-                File1 = _file1,
-                File2 = fileName
-            });
-
-            _file1 = string.Empty;
+            _file1 = fileName;
+            return;
         }
-        finally
+
+        await writer.WriteAsync(new FileMergeDto
         {
-            _semaphore.Release();
-        }        
+            File1 = _file1,
+            File2 = fileName
+        });
+
+        _file1 = string.Empty;
     }
 }

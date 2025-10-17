@@ -1,10 +1,11 @@
 # Sortzilla [![.NET build and test](https://github.com/rumkit/Sortzilla/actions/workflows/dotnet-build-and-test.yml/badge.svg)](https://github.com/rumkit/Sortzilla/actions/workflows/dotnet-build-and-test.yml)
 
-<img align="right" src=".github/docs/sortzilla.png" width="400">
+<img align="right" src=".github/docs/sortzilla.png" width="250">
 
 - [Description](#description)
 - [Build](#build)
 - [Usage](#usage)
+- [Benchmarks](#benchmarks)
 
 
 # Description
@@ -58,3 +59,32 @@ COMMANDS:
     validate <FileName>    Validates existing file and checks whether it is sorted
     sort <FileName>        Sorts the provided file
 ```
+
+# Benchmarks
+
+## Rig
+
+- CPU: i9-13980HX (2.20 GHz) (8 performance cores + 16 efficiency cores)
+- RAM: 32GB
+- Disk: External USB SSD capped at 10Gb/s
+
+## Memory consumption
+
+Typical memory consumption for generation is ~50MB and for validation is ~30MB. Both generation and validation are single threaded operations and their memory consumption doesn't not depend on the file size.
+
+For sorting operation, memory consumption depends on the amount of worker threads and peaks at approximately `Nworkers * 1.5 * chunkSize`. Thus a sorting job with 16 worker threads using default chunks of 128MB will peak at ~3GB with some overhead value. 
+
+## Timings
+
+- 100GB file generation with 10K word dictionary ~7 minutes
+
+`.\Sortzilla.CLI.exe generate output.txt -s 100G -d .\english-10k-sorted.txt`
+
+- 100GB file validation ~6.5 minutes
+
+`.\Sortzilla.CLI.exe valid output.txt`
+
+- Sorting
+  - 1GB file    ~23 seconds
+  - 10GB file   ~4.5 minutes
+  - 100GB file   // to be added

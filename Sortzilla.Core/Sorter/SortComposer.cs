@@ -43,8 +43,8 @@ public static class SortComposer
         var mergeProducer = new FileMergeProducer(mergeChannel.Writer, sortContext);
         var mergeConsumer = new FileMergeConsumer(mergeChannel.Reader, sortContext, mergeProducer.OnNewFileReadyAsync);
 
-        await mergeProducer.MergeAsync();
         mergeConsumer.Run();
+        await mergeProducer.MergeAsync();        
 
         // Wait for all merge workers to complete
         await mergeConsumer;

@@ -29,7 +29,7 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
         var outputFileName = Path.Combine(_context.WorkingDirectory, $"{Guid.NewGuid():N}.part");
         
         using var outputFile = File.Create(outputFileName);
-        using var outputWriter = new StreamWriter(outputFile, bufferSize: 10_000_000 );
+        using var outputWriter = new StreamWriter(outputFile, bufferSize: SortSettingsInternal.DefaultWriteBuffer );
 
         using (var inputReader1 = File.OpenText(file1))
         using (var inputReader2 = File.OpenText(file2))
