@@ -8,7 +8,7 @@ public class GeneratorToFileBenchmarks
 {
     private const string TestFilePath = "testfile.txt";
     const long TargetSize = 100_000_000; // ~100 MB
-    private static readonly SimpleLinesGenerator _generator = new(
+    private static readonly SimpleLinesGenerator Generator = new(
         new RandomPositiveNumberSource(),
         new RandomStringSource()
     );
@@ -23,7 +23,7 @@ public class GeneratorToFileBenchmarks
         _linesGeneratorWithRandomWords = new OptimizedLinesGenerator(new RandomStringPartWriter());
         _linesGeneratorWithCachedRandomWords = new OptimizedLinesGenerator(new RandomCachedDictionaryStringSource());
 
-        var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToArray();
+        var dictionary = File.ReadAllLines("english-10k-sorted.txt");
         _linesGeneratorWithDictionary = new OptimizedLinesGenerator(new StaticDictionaryStringSource(dictionary));
     }
 
@@ -32,55 +32,47 @@ public class GeneratorToFileBenchmarks
     [IterationCount(1)]
     public async Task SimpleGenerator()
     {
+        await using var fStream = File.Create(TestFilePath);
+        await using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
         
-        using var fStream = File.Create(TestFilePath);
-        using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
+        foreach (var line in Generator.GenerateLines(TargetSize))
         {
-            foreach (var line in _generator.GenerateLines(TargetSize))
-            {
-                await writer.WriteAsync(line);
-            }
-
-            await writer.FlushAsync();
+            await writer.WriteAsync(line);
         }
+
+        await writer.FlushAsync();
     }
 
     [Benchmark]
     [IterationCount(1)]
     public async Task LinesGeneratorRandom()
     {
-        using var fStream = File.Create(TestFilePath);
-        using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
-        {
-            _linesGeneratorWithRandomWords.GenerateLines(TargetSize, writer.Write);
-
-            await writer.FlushAsync();
-        }
+        await using var fStream = File.Create(TestFilePath);
+        await using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
+        
+        _linesGeneratorWithRandomWords.GenerateLines(TargetSize, writer.Write);
+        await writer.FlushAsync();
     }
 
     [Benchmark]
     [IterationCount(1)]
     public async Task LinesGeneratorCached()
     {
-        using var fStream = File.Create(TestFilePath);
-        using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
-        {
-            _linesGeneratorWithCachedRandomWords.GenerateLines(TargetSize, writer.Write);
-
-            await writer.FlushAsync();
-        }
+        await using var fStream = File.Create(TestFilePath);
+        await using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
+        
+        _linesGeneratorWithCachedRandomWords.GenerateLines(TargetSize, writer.Write);
+        await writer.FlushAsync();
     }
 
     [Benchmark]
     [IterationCount(1)]
     public async Task LinesGeneratorDictionary()
     {
-        using var fStream = File.Create(TestFilePath);
-        using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
-        {
-            _linesGeneratorWithDictionary.GenerateLines(TargetSize, writer.Write);
-
-            await writer.FlushAsync();
-        }
+        await using var fStream = File.Create(TestFilePath);
+        await using var writer = new StreamWriter(fStream, bufferSize: 10_000_000);
+        
+        _linesGeneratorWithDictionary.GenerateLines(TargetSize, writer.Write);
+        await writer.FlushAsync();
     }
 }

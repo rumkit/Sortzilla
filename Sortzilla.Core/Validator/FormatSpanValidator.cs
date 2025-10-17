@@ -14,7 +14,6 @@ public static class FormatSpanValidator
         Span<char> firstLine = stackalloc char[SortSettingsInternal.MaxLineLength];
         Span<char> secondLine = stackalloc char[SortSettingsInternal.MaxLineLength];
 
-        var comparer = new OptimizedLinesComparer();
         using var reader = new StreamSpanReader(stream);
 
         if (!ReadNextLine(reader, firstLine, out int firstLineLength) || !LineRegex.IsMatch(firstLine[..firstLineLength]))

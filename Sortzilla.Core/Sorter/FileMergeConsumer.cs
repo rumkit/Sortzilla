@@ -2,7 +2,7 @@
 
 namespace Sortzilla.Core.Sorter;
 
-internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, SortContext context, Func<string, long, Task> fileMergedCallback)
+internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, SortContext context, Func<string, long, ValueTask> fileMergedCallback)
     : ParallelConsumerBase(context)
 {
     private readonly IComparer<string> _comparer = new OptimizedLinesComparer();
@@ -51,19 +51,16 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
                 }
             }
 
-            if (line1 != null)
-                await outputWriter.WriteLineAsync(line1);
-            if (line2 != null)
-                await outputWriter.WriteLineAsync(line2);
-
-            while (!inputReader1.EndOfStream)
+            while (line1 != null)
             {            
-                await outputWriter.WriteLineAsync(await inputReader1.ReadLineAsync());
+                 await outputWriter.WriteLineAsync(line1);
+                 line1 = await inputReader1.ReadLineAsync();
             }
 
-            while (!inputReader2.EndOfStream)
+            while (line2 != null)
             {
-                await outputWriter.WriteLineAsync(await inputReader2.ReadLineAsync());
+                await outputWriter.WriteLineAsync(line2);
+                line2 = await inputReader2.ReadLineAsync();
             }
         }
 

@@ -6,9 +6,8 @@ namespace Sortzilla.Benchmarks;
 [MemoryDiagnoser]
 public class GeneratorToMemoryBenchmarks
 {
-    private readonly SimpleLinesGenerator _simpleLinesGenerator = new SimpleLinesGenerator(new RandomPositiveNumberSource(), new RandomStringSource());
     const long TargetSize = 100_000_000; // ~100 MB
-    private static readonly SimpleLinesGenerator _generator = new(
+    private static readonly SimpleLinesGenerator Generator = new(
         new RandomPositiveNumberSource(),
         new RandomStringSource()
     );
@@ -24,7 +23,7 @@ public class GeneratorToMemoryBenchmarks
 
         _linesGeneratorWithCachedRandomWords = new OptimizedLinesGenerator(new RandomCachedDictionaryStringSource());
 
-        var dictionary = File.ReadAllLines("english-10k-sorted.txt").ToArray();
+        var dictionary = File.ReadAllLines("english-10k-sorted.txt");
         _linesGeneratorWithDictionary = new OptimizedLinesGenerator(new StaticDictionaryStringSource(dictionary));
     }
 
@@ -33,7 +32,7 @@ public class GeneratorToMemoryBenchmarks
     public int SimpleGenerator()
     {
         int count = 0;
-        foreach (var line in _generator.GenerateLines(TargetSize))
+        foreach (var _ in Generator.GenerateLines(TargetSize))
         {
             count++;
         }

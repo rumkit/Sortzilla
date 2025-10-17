@@ -23,7 +23,7 @@ public class LinesComparerBenchmarks
         1032554530. NEnables furniture single bloomberg involved qty limit get column cowboy moment        
         """;
 
-    private static readonly string[] input = TestSample.Split(Environment.NewLine);
+    private static readonly string[] Input = TestSample.Split(Environment.NewLine);
     private readonly LinesComparer _linesComparer = new ();
     private readonly OptimizedLinesComparer _optimizedLinesComparer = new();
 
@@ -31,9 +31,9 @@ public class LinesComparerBenchmarks
     public int SimpleLinesComparer()
     {
         var sum = 0;
-        for (int i = 0; i < input.Length - 1; i++)
+        for (int i = 0; i < Input.Length - 1; i++)
         {
-            sum += _linesComparer.Compare(input[i], input[i + 1]);
+            sum += _linesComparer.Compare(Input[i], Input[i + 1]);
         }
 
         return sum;
@@ -43,9 +43,9 @@ public class LinesComparerBenchmarks
     public int OptimizedLinesComparer()
     {
         var sum = 0;
-        for (int i = 0; i < input.Length - 1; i++)
+        for (int i = 0; i < Input.Length - 1; i++)
         {
-            sum += _optimizedLinesComparer.Compare(input[i], input[i + 1]);
+            sum += _optimizedLinesComparer.Compare(Input[i], Input[i + 1]);
         }
 
         return sum;

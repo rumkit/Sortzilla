@@ -9,13 +9,13 @@ internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortContext
 
     public string? ResultFileName { get; private set; }
 
-    public async Task MergeAsync()
+    public async ValueTask MergeAsync()
     {
         // block adding new files until initial processing is over
         await _semaphore.WaitAsync();
         try
         {
-            foreach (var fileName in Directory.EnumerateFiles(context.WorkingDirectory))
+            foreach (var fileName in Directory.GetFiles(context.WorkingDirectory))
             {
                 await OnNewFileReadyInternalAsync(fileName, new FileInfo(fileName).Length);
             }
@@ -26,7 +26,7 @@ internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortContext
         }
     }
 
-    public async Task OnNewFileReadyAsync(string fileName, long fileSize)
+    public async ValueTask OnNewFileReadyAsync(string fileName, long fileSize)
     {
         await _semaphore.WaitAsync();
 
@@ -40,7 +40,7 @@ internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortContext
         }
     }
 
-    internal async Task OnNewFileReadyInternalAsync(string fileName, long fileSize)
+    internal async ValueTask OnNewFileReadyInternalAsync(string fileName, long fileSize)
     {
         // The file is the final merged file
         if (fileSize >= context.FileSize)
