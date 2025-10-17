@@ -5,12 +5,12 @@ namespace Sortzilla.Tests;
 
 internal class StreamSpanReaderTests
 {
-    private const string TestData =
-        "1. Apple\r\n" +
-        "2. Banana\r\n" +
-        "3. Cherry\r\n" +
-        "4. Date\r\n" +
-        "5. Elderberry\r\n";
+    private static readonly string TestData =
+        "1. Apple" + Environment.NewLine + 
+        "2. Banana" + Environment.NewLine +
+        "3. Cherry" + Environment.NewLine +
+        "4. Date" + Environment.NewLine +
+        "5. Elderberry";
 
     [Test]
     public async Task Read()
