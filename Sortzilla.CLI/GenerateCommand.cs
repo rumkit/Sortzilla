@@ -1,7 +1,6 @@
 ﻿using Sortzilla.Core.Generator;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System;
 using System.Text.RegularExpressions;
 
 public class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
@@ -61,16 +60,19 @@ public class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             var generator = new OptimizedLinesGenerator(wordsSource);
             long bytesWrittern = 0;
 
-            var generatorTask = Task.Run(() => generator.GenerateLines(size, lineSpan =>
+            var workerTask = Task.Run(() => generator.GenerateLines(size, lineSpan =>
             {
                 streamWriter.Write(lineSpan);
                 bytesWrittern += lineSpan.Length;
             }));
 
-            while (!generatorTask.IsCompleted)
+            while (!workerTask.IsCompleted)
             {
                 fileTask.Value = bytesWrittern * 100 / size;
+                await Task.Delay(250);
             }
+
+            fileTask.Value = 100;
         });
 
         AnsiConsole.MarkupLine($"[green]Done![/]");

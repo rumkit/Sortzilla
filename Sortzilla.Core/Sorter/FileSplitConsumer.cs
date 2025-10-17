@@ -1,22 +1,13 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading.Channels;
+﻿using System.Threading.Channels;
 
 namespace Sortzilla.Core.Sorter;
 
-internal class FileSplitConsumer(ChannelReader<FileSplitDto> channelReader, SortContext context)
-{
-    private readonly List<Task> _workerTasks = new();
+internal class FileSplitConsumer(ChannelReader<FileSplitDto> channelReader, SortContext context) : ParallelConsumerBase(context)
+{ 
     private static readonly IComparer<string> LinesComparer = new OptimizedLinesComparer();
+    private readonly SortContext _context = context;
 
-    public void Run()
-    {
-        for (int i = 0; i < context.Settings.MaxWorkersCount; i++)
-        {
-            _workerTasks.Add(Task.Run(WorkerPayload));
-        }
-    }
-
-    private async Task WorkerPayload()
+    protected override async Task WorkerPayload()
     {
         while (await channelReader.WaitToReadAsync())
         {
@@ -24,10 +15,8 @@ internal class FileSplitConsumer(ChannelReader<FileSplitDto> channelReader, Sort
             {
                 var sortedLines = fileChunk.Lines.OrderBy(x => x, LinesComparer);
                 var partName = $"{Guid.NewGuid():N}.part";
-                await File.WriteAllLinesAsync(Path.Combine(context.WorkingDirectory, partName), sortedLines);
+                await File.WriteAllLinesAsync(Path.Combine(_context.WorkingDirectory, partName), sortedLines);
             }                    
         }
-    }
-
-    public TaskAwaiter GetAwaiter() => Task.WhenAll(_workerTasks).GetAwaiter();
+    }    
 }

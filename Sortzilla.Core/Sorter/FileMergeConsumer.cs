@@ -1,22 +1,15 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading.Channels;
+﻿using System.Threading.Channels;
 
 namespace Sortzilla.Core.Sorter;
 
 internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, SortContext context, Func<string, long, Task> fileMergedCallback)
+    : ParallelConsumerBase(context)
 {
     private readonly List<Task> _workerTasks = new();
     private readonly IComparer<string> _comparer = new OptimizedLinesComparer();
+    private readonly SortContext _context = context;
 
-    public void Run()
-    {
-        for (int i = 0; i < context.Settings.MaxWorkersCount; i++)
-        {
-            _workerTasks.Add(Task.Run(WorkerPayload));
-        }
-    }
-
-    private async Task WorkerPayload()
+    protected override async Task WorkerPayload()
     {
         while (await channelReader.WaitToReadAsync())
         {
@@ -33,8 +26,10 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
 
     internal async Task<(string, long)> MergeFiles(string file1, string file2)
     {
-        var outputFileName = Path.Combine(context.WorkingDirectory, $"{Guid.NewGuid():N}.part");
-        using var outputWriter = File.CreateText(outputFileName);
+        var outputFileName = Path.Combine(_context.WorkingDirectory, $"{Guid.NewGuid():N}.part");
+        
+        using var outputFile = File.Create(outputFileName);
+        using var outputWriter = new StreamWriter(outputFile, bufferSize: 10_000_000 );
 
         using (var inputReader1 = File.OpenText(file1))
         using (var inputReader2 = File.OpenText(file2))
@@ -80,6 +75,4 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
         await outputWriter.FlushAsync();
         return (outputFileName, outputWriter.BaseStream.Length);
     }
-
-    public TaskAwaiter GetAwaiter() => Task.WhenAll(_workerTasks).GetAwaiter();
 }

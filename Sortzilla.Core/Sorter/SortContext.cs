@@ -19,7 +19,7 @@ internal class SortContext
             InputFileName = inputFileName,
             OutputFileName = outputFileName ?? $"{Path.GetFileNameWithoutExtension(inputFileName)}-sorted.{Path.GetExtension(inputFileName)}", // input.txt => input-sorted.txt
             Settings = settingsInternal,
-            WorkingDirectory = Path.Combine(settingsInternal.TempPath, "SortZilla", inputFileName),
+            WorkingDirectory = Path.Combine(settingsInternal.TempPath, "SortZilla", Path.GetFileName(inputFileName)),
             FileSize = fileSize
         };
     }
@@ -31,7 +31,7 @@ internal class SortContext
         
         // for extra small files chunks are either 1KB or fileSize whatever is smaller
         chunkSizeBytes = Math.Max(chunkSizeBytes, 1024);
-        chunkSizeBytes = Math.Min(chunkSizeBytes, (int)inputFileLength);
+        chunkSizeBytes = (int)Math.Min(chunkSizeBytes, inputFileLength);
             
 
         return new SortSettingsInternal

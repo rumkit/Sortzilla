@@ -17,7 +17,7 @@ public class RandomCachedDictionaryStringSource(int dictionarySize = 100_000) : 
         if (!_isDictionarySeeded)
             SeedDictionary();
 
-        return _dictionary[_random.Next(_dictionary.Count)];
+        return _dictionary[_random.Next(dictionarySize)];
     }
 
     private char GetNextChar() => Chars[_random.Next(Chars.Length)];

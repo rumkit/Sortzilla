@@ -2,7 +2,7 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 
-public class ValidateCommand : Command<ValidateCommand.Settings>
+public class ValidateCommand : AsyncCommand<ValidateCommand.Settings>
 {
     public class Settings : CommandSettings
     {
@@ -11,7 +11,7 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
     }
 
 
-    public override int Execute(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         var fileLength = new FileInfo(settings.FileName).Length;
         using var fileStream = File.OpenRead(settings.FileName);
@@ -20,7 +20,7 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
         bool isSorted = false;
         bool hasRepetitions = false;
 
-        AnsiConsole.Progress()
+        await AnsiConsole.Progress()
         .AutoClear(false)   // Do not remove the task list when done
         .HideCompleted(false)   // Hide tasks as they are completed
         .Columns(
@@ -31,7 +31,7 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
                 new ElapsedTimeColumn(),        // Elapsed time
                 new SpinnerColumn(),            // Spinner
         ])
-        .Start(ctx =>
+        .StartAsync(async ctx =>
         {
             var validateTask = ctx.AddTask("Checking file", maxValue: 100);
             long bytesProcessed = 0;
@@ -42,7 +42,10 @@ public class ValidateCommand : Command<ValidateCommand.Settings>
             while (!workerTask.IsCompleted)
             {
                 validateTask.Value = bytesProcessed * 100 / fileLength;
+                await Task.Delay(250);
             }
+
+            validateTask.Value = 100;
         });
 
         var rows = new List<Text>()

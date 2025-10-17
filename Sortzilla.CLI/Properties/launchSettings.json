@@ -2,7 +2,7 @@
   "profiles": {
     "Sortzilla.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "sort output.txt"
+      "commandLineArgs": "sort D:\\Test\\sz-file-100G.txt -o D:\\Test\\sz-file-100G-sorted.txt -w 8 -t D:\\Test\\TMP"
     }
   }
 }
