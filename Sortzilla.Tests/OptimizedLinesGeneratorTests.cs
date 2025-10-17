@@ -6,14 +6,14 @@ namespace Sortzilla.Tests;
 internal class OptimizedLinesGeneratorTests
 {
     private readonly TestSequenceSource<int> _digitsSource = new([1, 2, 3]);
-    private readonly TestSequenceSource<bool> entropyFalseSource = new([false]);
-    private readonly TestSequenceSource<bool> entropyTrueSource = new([true]);
+    private readonly TestSequenceSource<bool> _entropyFalseSource = new([false]);
+    private readonly TestSequenceSource<bool> _entropyTrueSource = new([true]);
     private readonly TestSequenceSource<string> _wordsSource = new(["one", "two", "three"]);
     private readonly OptimizedLinesGenerator _generator; 
 
     public OptimizedLinesGeneratorTests()
     {
-        _generator = new(new TestWordsGenerator(_wordsSource), _digitsSource, entropyFalseSource);
+        _generator = new(new TestWordsGenerator(_wordsSource), _digitsSource, _entropyFalseSource);
     }
 
     [Test]
@@ -48,7 +48,7 @@ internal class OptimizedLinesGeneratorTests
         var generator = new OptimizedLinesGenerator(
             new TestWordsGenerator(_wordsSource),
             _digitsSource,
-            entropyTrueSource);
+            _entropyTrueSource);
         var lines = new List<string>();
         generator.GenerateLines(18, line => lines.Add(line.ToString()));
 

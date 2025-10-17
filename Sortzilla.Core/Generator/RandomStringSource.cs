@@ -4,8 +4,8 @@ namespace Sortzilla.Core.Generator;
 
 public class RandomStringSource : ISequenceSource<string>
 {
-    private Random _random = new Random();
-    private const string _chars = "abcdefghijklmnopqrstuvwxyz";
+    private readonly Random _random = new ();
+    private const string Chars = "abcdefghijklmnopqrstuvwxyz";
     private readonly int _minLength;
     private readonly int _maxLength;
 
@@ -20,7 +20,7 @@ public class RandomStringSource : ISequenceSource<string>
         _maxLength = maxLength;
     }
 
-    private char GetNextChar() => _chars[_random.Next(_chars.Length)];
+    private char GetNextChar() => Chars[_random.Next(Chars.Length)];
     public string Next()
     {
         int requiredLength = _random.Next(_minLength, _maxLength + 1);
@@ -28,15 +28,15 @@ public class RandomStringSource : ISequenceSource<string>
 
         while(sBuilder.Length < requiredLength)
         {
-            // first character is always uppercase
+            // the first character is always uppercase
             if (sBuilder.Length == 0)
             {
-                sBuilder.Append(char.ToUpper(_chars[_random.Next(_chars.Length)]));
+                sBuilder.Append(char.ToUpper(Chars[_random.Next(Chars.Length)]));
                 continue;
             }
 
             // every ~5th character is a space
-            if (_random.Next() % 5 == 0 && sBuilder[sBuilder.Length - 1] != ' ') 
+            if (_random.Next() % 5 == 0 && sBuilder[^1] != ' ') 
             {
                 sBuilder.Append(' ');
             }

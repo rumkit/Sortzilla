@@ -1,6 +1,6 @@
 ﻿namespace Sortzilla.Core.Sorter;
 
-internal class FileSplitDto()
+internal class FileSplitDto
 {
     public required string[] Lines { get; init; }
 }

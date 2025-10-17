@@ -1,6 +1,6 @@
-﻿using Sortzilla.Core.Sorter;
+﻿using System.Threading.Channels;
+using Sortzilla.Core.Sorter;
 using Sortzilla.Tests.TestUtils;
-using System.Threading.Channels;
 
 namespace Sortzilla.Tests;
 

@@ -13,14 +13,16 @@ internal class FileGenerationTest
     private const string OutputFilePath = GlobalHooks.OutputFileName;
     private const int SizeToGenerate = 100_000_000; // ~100 MB
     private const int BufferSize = 1_000_000; // ~1 MB
-    private static readonly SimpleLinesGenerator _simpleGenerator = new(
+
+    private static readonly SimpleLinesGenerator SimpleGenerator = new(
         new RandomPositiveNumberSource(),
         new RandomStringSource()
     );
-    private static readonly OptimizedLinesGenerator _optimizedGenerator = new(
-        new RandomStringPartWriter()
-,
-        new RandomPositiveNumberSource());
+
+    private static readonly OptimizedLinesGenerator OptimizedGenerator = new(
+        new RandomStringPartWriter(),
+        new RandomPositiveNumberSource()
+    );
 
     [Test]
     public async Task Simple_GenerateFileOfSufficientSize()
@@ -28,7 +30,7 @@ internal class FileGenerationTest
         using (var fStream = File.Create(TestFilePath))
         using (var writer = new StreamWriter(fStream, bufferSize: BufferSize))
         {
-            foreach (var line in _simpleGenerator.GenerateLines(SizeToGenerate))
+            foreach (var line in SimpleGenerator.GenerateLines(SizeToGenerate))
             {
                 await writer.WriteAsync(line);
             }
@@ -44,7 +46,7 @@ internal class FileGenerationTest
         using (var fStream = File.Create(TestFilePath))
         using (var writer = new StreamWriter(fStream, bufferSize: BufferSize))
         {
-            _optimizedGenerator.GenerateLines(SizeToGenerate, writer.Write);
+            OptimizedGenerator.GenerateLines(SizeToGenerate, writer.Write);
         }
 
         var fileSize = new FileInfo(TestFilePath).Length;
@@ -57,11 +59,11 @@ internal class FileGenerationTest
         using (var fStream = File.Create(TestFilePath))
         using (var writer = new StreamWriter(fStream, bufferSize: 10_000))
         {
-            _optimizedGenerator.GenerateLines(100_000, writer.Write);
+            OptimizedGenerator.GenerateLines(100_000, writer.Write);
         }
 
 
-        using var readStream = File.OpenRead(TestFilePath);        
+        using var readStream = File.OpenRead(TestFilePath);
         var result = FormatValidator.ValidateLines(readStream);
 
         await Assert.That(result.HasValidFormat).IsTrue();
@@ -75,7 +77,7 @@ internal class FileGenerationTest
         using (var fStream = File.Create(TestFilePath))
         using (var writer = new StreamWriter(fStream, bufferSize: 10_000))
         {
-            _optimizedGenerator.GenerateLines(100_000, writer.Write);
+            OptimizedGenerator.GenerateLines(100_000, writer.Write);
         }
 
         var validator = new FileContentsValidator();
@@ -91,8 +93,9 @@ internal class FileGenerationTest
         using (var fStream = File.Create(TestFilePath))
         using (var writer = new StreamWriter(fStream, bufferSize: 10_000))
         {
-            _optimizedGenerator.GenerateLines(100_000, writer.Write);
+            OptimizedGenerator.GenerateLines(100_000, writer.Write);
         }
+
         var validator = new FileContentsValidator();
         validator.CollectData(TestFilePath);
 

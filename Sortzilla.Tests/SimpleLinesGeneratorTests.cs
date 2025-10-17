@@ -5,16 +5,16 @@ namespace Sortzilla.Tests;
 
 internal class SimpleLinesGeneratorTests
 {
-    private static readonly TestSequenceSource<int> _digitsSource = new([1, 2, 3]);
-    private static readonly TestSequenceSource<string> _wordsSource = new(["one", "two", "three"]);
-    private static readonly SimpleLinesGenerator _generator = new SimpleLinesGenerator(_digitsSource, _wordsSource);
+    private static readonly TestSequenceSource<int> DigitsSource = new([1, 2, 3]);
+    private static readonly TestSequenceSource<string> WordsSource = new(["one", "two", "three"]);
+    private static readonly SimpleLinesGenerator Generator = new SimpleLinesGenerator(DigitsSource, WordsSource);
 
     [Test]
     [Arguments(-1)]
     [Arguments(0)]
     public async Task GenerateLines_WhenInvalidLength_Throws(long length)
     {
-        var action = () => { _generator.GenerateLines(length).First(); };
+        var action = () => { Generator.GenerateLines(length).First(); };
 
         await Assert.That(action).Throws<ArgumentException>();
     }
@@ -22,7 +22,7 @@ internal class SimpleLinesGeneratorTests
     [Test]
     public async Task GenerateLines_WhenCalled_GeneratesLines()
     {
-        var lines = _generator.GenerateLines(18).ToArray();
+        var lines = Generator.GenerateLines(18).ToArray();
         var expectedLines = new[]
         {
             $"1. one{Environment.NewLine}",

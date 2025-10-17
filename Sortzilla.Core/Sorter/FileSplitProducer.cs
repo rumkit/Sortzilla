@@ -9,7 +9,7 @@ internal class FileSplitProducer(ChannelWriter<FileSplitDto> channelWriter, Sort
         using var reader = new StreamReader(inputFile);
         var chunkSizeTarget = context.Settings.ChunkSizeBytes;
 
-        // Split file to chunks and send to consumers
+        // Split file into chunks and send to consumers
         while (!reader.EndOfStream)
         {
             var chunkLines = new List<string>(chunkSizeTarget / SortSettingsInternal.MaxLineLength);
@@ -17,7 +17,7 @@ internal class FileSplitProducer(ChannelWriter<FileSplitDto> channelWriter, Sort
             while (!reader.EndOfStream && currentChunkSize < chunkSizeTarget)
             {
                 var nextLine = await reader.ReadLineAsync();
-                if(nextLine is not null)
+                if(nextLine != null)
                 {
                     chunkLines.Add(nextLine);
                     currentChunkSize += nextLine.Length + Environment.NewLine.Length;

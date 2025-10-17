@@ -2,7 +2,7 @@
 
 public class RandomPositiveNumberSource : ISequenceSource<int>
 {
-    private Random _random = new Random();
+    private readonly Random _random = new ();
 
     public int Next()
     {

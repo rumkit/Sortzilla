@@ -1,7 +1,9 @@
-﻿using Sortzilla.Core.Generator;
+﻿using System.Text.RegularExpressions;
+using Sortzilla.Core.Generator;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System.Text.RegularExpressions;
+
+namespace Sortzilla.CLI;
 
 public class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
 {
@@ -35,45 +37,43 @@ public class GenerateCommand : AsyncCommand<GenerateCommand.Settings>
             _ => size
         };
 
-        using var fileStream = File.Create(settings.FileName);
-        using var streamWriter = new StreamWriter(fileStream, bufferSize: 10_000_000);
-
-
         await AnsiConsole.Progress()
-        .AutoClear(false)   // Do not remove the task list when done
-        .HideCompleted(false)   // Hide tasks as they are completed
-        .Columns(
-        [
+            .AutoClear(false)   // Do not remove the task list when done
+            .HideCompleted(false)   // Hide tasks as they are completed
+            .Columns(
+            [
                 new TaskDescriptionColumn(),    // Task description
                 new ProgressBarColumn(),        // Progress bar
                 new PercentageColumn(),         // Percentage
                 new ElapsedTimeColumn(),        // Elapsed time
                 new SpinnerColumn(),            // Spinner
-        ])
-        .StartAsync(async ctx =>
-        {
-            var fileTask = ctx.AddTask("Writing file");
-
-            ISequenceSource<string> wordsSource = settings.DictionaryFileName == null
-                ? new RandomCachedDictionaryStringSource()
-                : new StaticDictionaryStringSource(File.ReadAllLines(settings.DictionaryFileName));
-            var generator = new OptimizedLinesGenerator(wordsSource);
-            long bytesWrittern = 0;
-
-            var workerTask = Task.Run(() => generator.GenerateLines(size, lineSpan =>
+            ])
+            .StartAsync(async ctx =>
             {
-                streamWriter.Write(lineSpan);
-                bytesWrittern += lineSpan.Length;
-            }));
+                await using var fileStream = File.Create(settings.FileName);
+                await using var streamWriter = new StreamWriter(fileStream, bufferSize: 10_000_000);
+                var fileTask = ctx.AddTask("Writing file");
 
-            while (!workerTask.IsCompleted)
-            {
-                fileTask.Value = bytesWrittern * 100 / size;
-                await Task.Delay(250);
-            }
+                ISequenceSource<string> wordsSource = settings.DictionaryFileName == null
+                    ? new RandomCachedDictionaryStringSource()
+                    : new StaticDictionaryStringSource(await File.ReadAllLinesAsync(settings.DictionaryFileName));
+                var generator = new OptimizedLinesGenerator(wordsSource);
+                long bytesWritten = 0;
 
-            fileTask.Value = 100;
-        });
+                var workerTask = Task.Run(() => generator.GenerateLines(size, lineSpan =>
+                {
+                    streamWriter.Write(lineSpan);
+                    bytesWritten += lineSpan.Length;
+                }));
+
+                while (!workerTask.IsCompleted)
+                {
+                    fileTask.Value = bytesWritten * 100 / size;
+                    await Task.Delay(250);
+                }
+
+                fileTask.Value = 100;
+            });
 
         AnsiConsole.MarkupLine($"[green]Done![/]");
 

@@ -4,7 +4,7 @@ namespace Sortzilla.Core.Validator;
 
 public static class FormatValidator
 {
-    private readonly static Regex LineRegex = LineTools.LineRegex();
+    private static readonly Regex LineRegex = LineTools.LineRegex();
 
     public static (bool HasValidFormat, bool IsSorted, bool HasRepetitions) ValidateLines(Stream stream)
     {

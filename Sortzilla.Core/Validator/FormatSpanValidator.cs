@@ -1,11 +1,11 @@
-﻿using Sortzilla.Core.Sorter;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using Sortzilla.Core.Sorter;
 
 namespace Sortzilla.Core.Validator;
 
 public static class FormatSpanValidator
 {
-    private readonly static Regex LineRegex = LineTools.LineRegex();
+    private static readonly Regex LineRegex = LineTools.LineRegex();
 
     public static (bool HasValidFormat, bool IsSorted, bool HasRepetitions) ValidateLines(Stream stream, Action<long>? progressCallback = null)
     {

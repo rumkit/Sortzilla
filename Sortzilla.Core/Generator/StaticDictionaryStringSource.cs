@@ -1,8 +1,3 @@
 ﻿namespace Sortzilla.Core.Generator;
 
-public class StaticDictionaryStringSource : ArraySequenceSource<string>
-{
-    public StaticDictionaryStringSource(string[] source) : base(source)
-    {
-    }
-}
+public class StaticDictionaryStringSource(string[] source) : ArraySequenceSource<string>(source);

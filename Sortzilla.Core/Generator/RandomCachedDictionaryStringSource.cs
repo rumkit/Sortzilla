@@ -8,8 +8,8 @@ public class RandomCachedDictionaryStringSource(int dictionarySize = 100_000) : 
     private const int MaxWordLength = 10;
     private const int MinWordLength = 3;
 
-    private readonly Random _random = new Random();
-    private bool _isDictionarySeeded = false;
+    private readonly Random _random = new ();
+    private bool _isDictionarySeeded;
     private ReadOnlyCollection<string> _dictionary = Array.Empty<string>().AsReadOnly();
     
     public string Next()

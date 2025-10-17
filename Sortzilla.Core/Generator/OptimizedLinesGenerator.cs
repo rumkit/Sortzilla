@@ -38,7 +38,7 @@ public class OptimizedLinesGenerator
                 throw new InvalidOperationException($"Can't properly format {nextNumber}");
             var stringPartStart = charsWritten;
 
-            // occasionally if possible the previous line part will be duplicated
+            // occasionally, if possible, the previous line part will be duplicated
             if ((stringPartStart <= previousStringPartStart) && _entropySource.Next())
             {
                 lineBuffer[previousStringPartStart..previousLength].CopyTo(lineBuffer[stringPartStart..]);

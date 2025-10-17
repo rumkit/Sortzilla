@@ -5,7 +5,6 @@ namespace Sortzilla.Core.Sorter;
 internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, SortContext context, Func<string, long, Task> fileMergedCallback)
     : ParallelConsumerBase(context)
 {
-    private readonly List<Task> _workerTasks = new();
     private readonly IComparer<string> _comparer = new OptimizedLinesComparer();
     private readonly SortContext _context = context;
 
@@ -15,21 +14,21 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
         {
             if(channelReader.TryRead(out var filesPair))
             {
-                if (string.IsNullOrEmpty(filesPair.File1) && string.IsNullOrEmpty(filesPair.File2))
-                    continue;
-
                 var (outputFileName, outputFileSize) = await MergeFiles(filesPair.File1, filesPair.File2);
                 await fileMergedCallback(outputFileName, outputFileSize);
-            }            
+
+                File.Delete(filesPair.File1);
+                File.Delete(filesPair.File2);
+            }
         }
     }
 
     internal async Task<(string, long)> MergeFiles(string file1, string file2)
     {
         var outputFileName = Path.Combine(_context.WorkingDirectory, $"{Guid.NewGuid():N}.part");
-        
-        using var outputFile = File.Create(outputFileName);
-        using var outputWriter = new StreamWriter(outputFile, bufferSize: SortSettingsInternal.DefaultWriteBuffer );
+
+        await using var outputFile = File.Create(outputFileName);
+        await using var outputWriter = new StreamWriter(outputFile, bufferSize: SortSettingsInternal.DefaultWriteBuffer );
 
         using (var inputReader1 = File.OpenText(file1))
         using (var inputReader2 = File.OpenText(file2))
@@ -66,10 +65,7 @@ internal class FileMergeConsumer(ChannelReader<FileMergeDto> channelReader, Sort
             {
                 await outputWriter.WriteLineAsync(await inputReader2.ReadLineAsync());
             }
-        }        
-
-        File.Delete(file1);
-        File.Delete(file2);
+        }
 
         // flushing writer before getting file size for the callback
         await outputWriter.FlushAsync();

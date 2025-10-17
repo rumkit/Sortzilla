@@ -1,20 +1,20 @@
 ﻿namespace Sortzilla.Core.Generator;
 
-public class RandomStringPartWriter() : IStringPartWriter
+public class RandomStringPartWriter : IStringPartWriter
 {
     private const string Chars = "abcdefghijklmnopqrstuvwxyz";
-    private readonly Random _random = new Random();
+    private readonly Random _random = new ();
     
     private char GetNextChar() => Chars[_random.Next(Chars.Length)];
 
     public int WriteStringPart(Span<char> buffer)
     {
         int index = 0;
-        // randomly select length between half and full buffer size
+        // randomly select a length between half and full buffer size
         int requiredLength = _random.Next(buffer.Length / 2, buffer.Length);
         while (index < requiredLength)
         {
-            // first character is always uppercase
+            // the first character is always uppercase
             if (index == 0)
             {
                 buffer[index++] = char.ToUpper(Chars[_random.Next(Chars.Length)]);

@@ -7,18 +7,18 @@ internal class LinesComparer : IComparer<string>
     public int Compare(string? left, string? right)
     {
         if(left == null)
-            throw new ArgumentException(nameof(left), "Cannot be null");
+            throw new ArgumentException("Cannot be null", nameof(left));
         if (right == null)
-            throw new ArgumentException(nameof(right), "Cannot be null");
+            throw new ArgumentException("Cannot be null", nameof(right));
 
         var regex = LineTools.LineRegex();
 
         var matchLeft = regex.Match(left);
         if(!matchLeft.Success)
-            throw new ArgumentException(nameof(left), "Line format is invalid");
+            throw new ArgumentException("Line format is invalid", nameof(left));
         var matchRight = regex.Match(right);
         if (!matchRight.Success)
-            throw new ArgumentException(nameof(right), "Line format is invalid");
+            throw new ArgumentException("Line format is invalid", nameof(right));
 
         var stringComparisonResult = string.Compare(
             matchLeft.Groups["string"].Value,

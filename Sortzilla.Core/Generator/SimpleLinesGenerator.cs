@@ -2,9 +2,6 @@
 
 public class SimpleLinesGenerator(ISequenceSource<int> digitsSource, ISequenceSource<string> wordsSource)
 {
-    private ISequenceSource<int> _digitsSource = digitsSource;
-    private ISequenceSource<string> _wordsSource = wordsSource;
-
     public IEnumerable<string> GenerateLines(long requiredLength)
     {
         if(requiredLength < 1)
@@ -14,8 +11,8 @@ public class SimpleLinesGenerator(ISequenceSource<int> digitsSource, ISequenceSo
 
         while(currentLength < requiredLength)
         {
-            var nextNumber = _digitsSource.Next();
-            var nextString = _wordsSource.Next();
+            var nextNumber = digitsSource.Next();
+            var nextString = wordsSource.Next();
             var nextLine = $"{nextNumber}. {nextString}{Environment.NewLine}";
             currentLength += nextLine.Length;
             yield return nextLine;

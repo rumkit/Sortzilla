@@ -20,7 +20,7 @@ internal class StreamSpanReaderTests
         Span<char> lineBuffer = stackalloc char[100];
         List<string> lines = new();
 
-        int charsCount = 0;
+        int charsCount;
         do
         {
             charsCount = reader.ReadLine(lineBuffer);

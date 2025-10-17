@@ -7,9 +7,8 @@ public static class SortComposer
     public static async Task SortFileAsync(string fileName, string? outputFileName, SortSettings? settings = null)
     {
         var sortContext = SortContext.GetContext(fileName, outputFileName, settings);
-        
-        using var inputFileStream = File.OpenRead(fileName);
-        var fileSize = inputFileStream.Length;
+
+        await using var inputFileStream = File.OpenRead(fileName);
 
         // Prepare working directory for temp files
         if (Directory.Exists(sortContext.WorkingDirectory))

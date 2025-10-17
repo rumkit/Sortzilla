@@ -4,7 +4,7 @@ namespace Sortzilla.Core.Sorter;
 
 internal class FileMergeProducer(ChannelWriter<FileMergeDto> writer, SortContext context)
 {
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _semaphore = new (1, 1);
     private string _file1 = string.Empty;
 
     public string? ResultFileName { get; private set; }

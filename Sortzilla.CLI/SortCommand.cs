@@ -2,6 +2,8 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 
+namespace Sortzilla.CLI;
+
 public class SortCommand : AsyncCommand<SortCommand.Settings>
 {
     public class Settings : CommandSettings
@@ -22,33 +24,33 @@ public class SortCommand : AsyncCommand<SortCommand.Settings>
         public string? TempDirectory { get; set; }
     }
 
-    public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         await AnsiConsole.Progress()
-        .AutoClear(false)   // Do not remove the task list when done
-        .HideCompleted(false)   // Hide tasks as they are completed
-        .Columns(
-        [
+            .AutoClear(false)   // Do not remove the task list when done
+            .HideCompleted(false)   // Hide tasks as they are completed
+            .Columns(
+            [
                 new TaskDescriptionColumn(),    // Task description
                 new ProgressBarColumn(),        // Progress bar
                 new ElapsedTimeColumn(),        // Elapsed time
                 new SpinnerColumn(),            // Spinner
-        ])
-        .StartAsync(async ctx =>
-        {
-            var sortTask = ctx.AddTask("Sorting file");
-            sortTask.IsIndeterminate = true;
-
-            var sortSettings = new SortSettings
+            ])
+            .StartAsync(async ctx =>
             {
-                MaxWorkersCount = settings.WorkersCount,
-                ChunkSizeBytes = settings.MemoryLimit,
-                TempPath = settings.TempDirectory
-            };
-            await SortComposer.SortFileAsync(settings.FileName, settings.OutputFileName, sortSettings);
+                var sortTask = ctx.AddTask("Sorting file");
+                sortTask.IsIndeterminate = true;
 
-            sortTask.Value = 100;
-        });
+                var sortSettings = new SortSettings
+                {
+                    MaxWorkersCount = settings.WorkersCount,
+                    ChunkSizeBytes = settings.MemoryLimit,
+                    TempPath = settings.TempDirectory
+                };
+                await SortComposer.SortFileAsync(settings.FileName, settings.OutputFileName, sortSettings);
+
+                sortTask.Value = 100;
+            });
 
         AnsiConsole.MarkupLine($"[green]Done![/]");
 

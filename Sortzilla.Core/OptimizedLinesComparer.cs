@@ -5,25 +5,25 @@ internal class OptimizedLinesComparer : IComparer<string>
     public int Compare(string? left, string? right)
     {
         if(left == null)
-            throw new ArgumentException(nameof(left), "Cannot be null");
+            throw new ArgumentException("Cannot be null", nameof(left));
         if (right == null)
-            throw new ArgumentException(nameof(right), "Cannot be null");
+            throw new ArgumentException("Cannot be null", nameof(right));
 
         var leftSpan = left.AsSpan();
         var rightSpan = right.AsSpan();
 
         var leftDotIndex = left.IndexOf('.');
         if (leftDotIndex <= 0 )
-            throw new ArgumentException(nameof(left), "Line format is invalid");
+            throw new ArgumentException("Line format is invalid", nameof(left));
         
         var rightDotIndex = rightSpan.IndexOf('.');
         if (rightDotIndex <= 0)
-            throw new ArgumentException(nameof(right), "Line format is invalid");       
+            throw new ArgumentException("Line format is invalid", nameof(right));       
 
-        var stringPartComparasionResult = leftSpan[leftDotIndex ..].CompareTo(rightSpan[rightDotIndex ..], StringComparison.Ordinal);
+        var stringPartComparisonResult = leftSpan[leftDotIndex ..].CompareTo(rightSpan[rightDotIndex ..], StringComparison.Ordinal);
 
-        if(stringPartComparasionResult != 0)
-            return stringPartComparasionResult;
+        if(stringPartComparisonResult != 0)
+            return stringPartComparisonResult;
 
         if (int.TryParse(leftSpan[.. leftDotIndex], out var leftNumber)
             && int.TryParse(rightSpan[.. rightDotIndex], out var rightNumber))
@@ -31,6 +31,6 @@ internal class OptimizedLinesComparer : IComparer<string>
             return leftNumber.CompareTo(rightNumber);
         }
 
-        throw new ArgumentException("numbers", "Line format is invalid");
+        throw new ArgumentException("Line format is invalid", "numbers");
     }
 }

@@ -9,11 +9,7 @@ internal class FileContentsValidator
         var lines = File.ReadAllLines(fileName);
         foreach (var line in lines)
         {
-            if (!_linesDictionary.TryGetValue(line, out var value))
-            {
-                value = 0;
-            }
-
+            var value = _linesDictionary.GetValueOrDefault(line, 0);
             _linesDictionary[line] = ++value;
         }
     }

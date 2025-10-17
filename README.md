@@ -10,7 +10,7 @@
 
 # Description
 
-Sortzilla is a CLI tool that is able to generate text files of a specefic format and sort them. The tool supports large files (above 100GB).
+Sortzilla is a CLI tool that is able to generate text files of a specific format and sort them. The tool supports large files (above 100GB).
 
 The format is a simple text with each line containing number part and text part, e.g. 
 
@@ -26,7 +26,7 @@ Sorting algorithm considers text part and only if the text of both lines is the 
 
 # Build
 
-Checkout/download the repository and the following command from within the solution folder
+Checkout/download the repository and run the following command from within the solution folder
 
 ```
 dotnet build -c Release
@@ -70,13 +70,13 @@ COMMANDS:
 
 ## Memory consumption
 
-Typical memory consumption for generation is ~50MB and for validation is ~30MB. Both generation and validation are single threaded operations and their memory consumption doesn't not depend on the file size.
+Typical memory consumption for generation is ~50MB and for validation is ~30MB. Both generation and validation are single threaded operations and their memory consumption does not depend on the file size.
 
-For sorting operation, memory consumption depends on the amount of worker threads and peaks at approximately `Nworkers * 1.5 * chunkSize`. Thus a sorting job with 16 worker threads using default chunks of 128MB will peak at ~3GB with some overhead value. 
+For sorting operation memory consumption depends on the amount of worker threads and peaks at approximately `Nworkers * 1.5 * chunkSize`. Thus, a sorting job with 16 worker threads using default chunks of 128MB will peak at ~3GB with some overhead value. 
 
 ## Timings
 
-- 100GB file generation with 10K word dictionary ~7 minutes
+- 100GB file generation with 10K words dictionary ~7 minutes
 
 `.\Sortzilla.CLI.exe generate output.txt -s 100G -d .\english-10k-sorted.txt`
 
