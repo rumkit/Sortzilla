@@ -17,7 +17,7 @@ internal class SortContext
         return new SortContext
         {
             InputFileName = inputFileName,
-            OutputFileName = outputFileName ?? $"{Path.GetFileNameWithoutExtension(inputFileName)}-sorted.{Path.GetExtension(inputFileName)}", // input.txt => input-sorted.txt
+            OutputFileName = outputFileName ?? GetOutputFileName(inputFileName), 
             Settings = settingsInternal,
             WorkingDirectory = Path.Combine(settingsInternal.TempPath, "SortZilla", Path.GetFileName(inputFileName)),
             FileSize = fileSize
@@ -40,5 +40,14 @@ internal class SortContext
             MaxWorkersCount = workersCount,
             ChunkSizeBytes = chunkSizeBytes
         };            
+    }
+
+    internal static string GetOutputFileName(string inputFileName)
+    {
+        var directory = Path.GetDirectoryName(inputFileName) ?? string.Empty;
+        var extension = Path.GetExtension(directory) ?? string.Empty;
+
+        // .\directory\input.txt => .\directory\input-sorted.txt
+        return Path.Combine(directory, $"{Path.GetFileNameWithoutExtension(inputFileName)}-sorted", extension);
     }
 }

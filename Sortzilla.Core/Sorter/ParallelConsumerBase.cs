@@ -2,13 +2,13 @@
 
 namespace Sortzilla.Core.Sorter;
 
-internal abstract class ParallelConsumerBase(SortContext context)
+internal abstract class ParallelConsumerBase(int maxConcurrentWorkers)
 {
     private readonly List<Task> _workerTasks = new();
 
     public void Run()
     {
-        for (int i = 0; i < context.Settings.MaxWorkersCount; i++)
+        for (int i = 0; i < maxConcurrentWorkers; i++)
         {
             _workerTasks.Add(WorkerPayload());
         }

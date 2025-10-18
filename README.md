@@ -85,6 +85,8 @@ For sorting operation memory consumption depends on the amount of worker threads
 `.\Sortzilla.CLI.exe valid output.txt`
 
 - Sorting
-  - 1GB file    ~23 seconds
+  - 1GB file    ~20 seconds
   - 10GB file   ~4.5 minutes
-  - 100GB file   // to be added
+  - 100GB file   > 100 minutes
+
+`.\Sortzilla.CLI.exe sort output.txt -w 16`

@@ -10,7 +10,7 @@ public static class SortComposer
 
         await using var inputFileStream = File.OpenRead(fileName);
 
-        // Prepare working directory for temp files
+        // Prepare a working directory for temp files
         if (Directory.Exists(sortContext.WorkingDirectory))
             Directory.Delete(sortContext.WorkingDirectory, true);
 
@@ -23,9 +23,7 @@ public static class SortComposer
 
         var splitChannel = Channel.CreateBounded<FileSplitDto>(new BoundedChannelOptions(channelBound)
         {
-            SingleReader = false,
-            SingleWriter = true,
-            FullMode = BoundedChannelFullMode.Wait
+            SingleWriter = true
         });
 
         var splitProducer = new FileSplitProducer(splitChannel.Writer, sortContext);
@@ -38,7 +36,10 @@ public static class SortComposer
         await splitConsumer;
 
         // and start merging temp files
-        var mergeChannel = Channel.CreateUnbounded<FileMergeDto>();
+        var mergeChannel = Channel.CreateUnbounded<FileMergeDto>(new UnboundedChannelOptions()
+        {
+            SingleWriter = true,
+        });
         var mergeProducer = new FileMergeProducer(mergeChannel.Writer, sortContext);
         var mergeConsumer = new FileMergeConsumer(mergeChannel.Reader, sortContext, mergeProducer.OnNewFileReadyAsync);
 
